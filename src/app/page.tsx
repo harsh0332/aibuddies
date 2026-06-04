@@ -36,7 +36,7 @@ export default function Home() {
   useEffect(() => {
     if (typeof window !== "undefined") {
       window.scrollTo(0, 0);
-      (window as any).scrollStage = 0;
+      (window as any).targetStage = 0;
     }
   }, []);
 
@@ -101,21 +101,83 @@ export default function Home() {
       }
 
       ctx = gsap.context(() => {
-        // 1. Process Timeline line fill scroll-tied animation
-        gsap.fromTo(
+        // 1. Process Timeline line fill scroll-tied animation (horizontal & vertical)
+        const processTimeline = gsap.timeline({
+          scrollTrigger: {
+            trigger: "#process",
+            start: "top 80%",
+            end: "bottom 70%",
+            scrub: true,
+          }
+        });
+
+        processTimeline.fromTo(
           "#process-progress-line",
           { scaleX: 0 },
-          {
-            scaleX: 1,
-            ease: "none",
-            scrollTrigger: {
-              trigger: "#process",
-              start: "top 75%",
-              end: "bottom 60%",
-              scrub: true,
-            },
-          }
+          { scaleX: 1, ease: "none" }
         );
+
+        processTimeline.fromTo(
+          "#process-progress-line-mobile",
+          { scaleY: 0 },
+          { scaleY: 1, ease: "none" },
+          0
+        );
+
+        // Highlight process cards sequentially as they scroll into view
+        const cards = gsap.utils.toArray(".process-card");
+        const isDesktop = window.matchMedia("(min-width: 1024px)").matches;
+
+        if (isDesktop) {
+          cards.forEach((card: any, index: number) => {
+            const startOffset = index * 22;
+            const endOffset = startOffset + 22;
+
+            ScrollTrigger.create({
+              trigger: "#process",
+              start: `top+=${startOffset}% 70%`,
+              end: `top+=${endOffset}% 70%`,
+              toggleClass: { targets: card, className: "active-step" },
+            });
+
+            gsap.fromTo(
+              card,
+              { opacity: 0.4, scale: 0.97 },
+              {
+                opacity: 1,
+                scale: 1,
+                scrollTrigger: {
+                  trigger: "#process",
+                  start: `top+=${startOffset}% 85%`,
+                  end: `top+=${startOffset + 12}% 70%`,
+                  scrub: true,
+                }
+              }
+            );
+          });
+        } else {
+          cards.forEach((card: any) => {
+            gsap.fromTo(
+              card,
+              { 
+                opacity: 0.35, 
+                scale: 0.97, 
+              },
+              {
+                opacity: 1,
+                scale: 1,
+                ease: "power1.out",
+                scrollTrigger: {
+                  trigger: card,
+                  start: "top 85%",
+                  end: "top 55%",
+                  scrub: true,
+                  toggleClass: "active-step"
+                }
+              }
+            );
+          });
+        }
 
         // 2. Hero parallax / slight scale scale-out
         gsap.to(".hero-light-ray", {
@@ -139,24 +201,30 @@ export default function Home() {
             end: "top top",
             scrub: true,
             onUpdate: (self) => {
-              (window as any).scrollStage = self.progress; // 0.0 -> 1.0 (written directly to window for R3F)
+              if (self.progress < 1) {
+                (window as any).targetStage = self.progress;
+              }
             },
           });
 
-          // Trigger 2: Stage 1 -> 5: Services section (driven by CSS sticky progress through container)
+          // Trigger 2: Stage 1 -> 5: Services section (GSAP Pinning + Staged Morphing)
           const servicesTrigger = ScrollTrigger.create({
             trigger: "#services-container",
             start: "top top",
             end: "bottom bottom",
+            pin: "#services", // Explicit pinning to avoid CSS flex sticky failures
+            pinSpacing: false,
             scrub: true,
             onUpdate: (self) => {
-              const currentStage = 1.0 + self.progress * 4.0;
-              (window as any).scrollStage = currentStage; // 1.0 -> 5.0 (written directly to window for R3F)
-              
-              // Throttle React state updates to only fire when activeIndex actually changes
               const p = self.progress;
               const index = Math.min(Math.floor(p * 5), 4);
-              setActiveIndex((prev) => (prev !== index ? index : prev));
+              setActiveIndex((prev) => {
+                if (prev !== index) {
+                  (window as any).targetStage = 1.0 + index;
+                  return index;
+                }
+                return prev;
+              });
             },
           });
 
@@ -182,7 +250,7 @@ export default function Home() {
             end: "top 50%",
             scrub: true,
             onUpdate: (self) => {
-              (window as any).scrollStage = 5.0 + self.progress * 0.5; // 5.0 -> 5.5 (written directly to window for R3F)
+              (window as any).targetStage = 5.0 + self.progress * 0.5;
             },
           });
         }
@@ -200,7 +268,7 @@ export default function Home() {
 
       if (typeof window !== "undefined") {
         delete (window as any).scrollToService;
-        delete (window as any).scrollStage;
+        delete (window as any).targetStage;
       }
     };
   }, [isLoading, is3DActive]);
@@ -228,7 +296,7 @@ export default function Home() {
         <Navbar />
 
         {/* Staggered Sections stack with explicit opaque layering contexts */}
-        <main className="flex-1 w-full flex flex-col">
+        <main className="w-full block">
           <Hero is3DActive={is3DActive} />
           
           {/* About section: opaque layer covering fixed canvas */}

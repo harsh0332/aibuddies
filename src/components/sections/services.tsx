@@ -1,7 +1,7 @@
 "use client";
 
-import React from "react";
-import { motion } from "framer-motion";
+import React, { useRef, useState } from "react";
+import { motion, useInView } from "framer-motion";
 import { BRAND_CONFIG } from "@/config/content";
 import CornerBorders from "../ui/corner-borders";
 import { 
@@ -16,6 +16,52 @@ interface ServicesProps {
   interactive?: boolean;
   activeIndex?: number;
   onCardClick?: (index: number) => void;
+}
+
+function WordReveal({ text, className = "" }: { text: string; className?: string }) {
+  const ref = useRef<HTMLHeadingElement>(null);
+  const inView = useInView(ref, { once: true, margin: "-100px" });
+  
+  const words = text.split(" ");
+  
+  const wordVariants = {
+    hidden: { 
+      opacity: 0, 
+      y: 28, 
+      rotateX: -18 
+    },
+    visible: (i: number) => ({
+      opacity: 1,
+      y: 0,
+      rotateX: 0,
+      transition: {
+        duration: 0.8,
+        ease: [0.16, 1, 0.3, 1] as const,
+        delay: i * 0.08,
+      }
+    })
+  };
+
+  return (
+    <h2 
+      ref={ref} 
+      className={`${className} flex flex-wrap gap-x-3 gap-y-1`}
+      style={{ perspective: "1000px" }}
+    >
+      {words.map((word, i) => (
+        <motion.span
+          key={i}
+          custom={i}
+          variants={wordVariants}
+          initial="hidden"
+          animate={inView ? "visible" : "hidden"}
+          className="inline-block origin-top will-change-transform"
+        >
+          {word}
+        </motion.span>
+      ))}
+    </h2>
+  );
 }
 
 export default function Services({
@@ -66,6 +112,44 @@ export default function Services({
     },
   };
 
+  const sliderRef = useRef<HTMLDivElement>(null);
+  const [activeMobileIndex, setActiveMobileIndex] = useState(0);
+
+  const handleScroll = () => {
+    if (!sliderRef.current) return;
+    const container = sliderRef.current;
+    const scrollLeft = container.scrollLeft;
+    const width = container.offsetWidth;
+    const cardElements = container.children;
+    let closestIndex = 0;
+    let minDistance = Infinity;
+
+    for (let i = 0; i < cardElements.length; i++) {
+      const card = cardElements[i] as HTMLElement;
+      const cardCenter = card.offsetLeft + card.offsetWidth / 2;
+      const containerCenter = scrollLeft + width / 2;
+      const distance = Math.abs(cardCenter - containerCenter);
+      if (distance < minDistance) {
+        minDistance = distance;
+        closestIndex = i;
+      }
+    }
+    setActiveMobileIndex(closestIndex);
+  };
+
+  const scrollToCard = (index: number) => {
+    if (!sliderRef.current) return;
+    const container = sliderRef.current;
+    const card = container.children[index] as HTMLElement;
+    if (card) {
+      container.scrollTo({
+        left: card.offsetLeft - (container.offsetWidth - card.offsetWidth) / 2,
+        behavior: "smooth",
+      });
+      setActiveMobileIndex(index);
+    }
+  };
+
   if (interactive) {
     return (
       <div 
@@ -75,7 +159,7 @@ export default function Services({
       >
         <section 
           id="services" 
-          className="sticky top-0 h-screen w-full flex items-center justify-center overflow-hidden py-20 md:py-28 px-6 md:px-12 lg:px-24 bg-transparent"
+          className="relative h-screen w-full flex items-center justify-center overflow-hidden py-20 md:py-28 px-6 md:px-12 lg:px-24 bg-transparent"
         >
         <div className="max-w-6xl mx-auto w-full">
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16 items-start">
@@ -86,9 +170,10 @@ export default function Services({
                 <span className="text-xs font-mono tracking-widest text-signature uppercase">
                   02 / What We Build
                 </span>
-                <h2 className="text-3xl md:text-5xl font-extrabold tracking-tight text-white font-sora">
-                  AI Automations & Skills
-                </h2>
+                <WordReveal 
+                  text="AI Automations & Skills" 
+                  className="text-3xl md:text-5xl font-extrabold tracking-tight text-white font-sora"
+                />
                 <p className="text-base text-text-tertiary leading-relaxed">
                   We deploy custom-configured autonomous modules designed to run under one roof, integrating cleanly with your current business workflow.
                 </p>
@@ -197,18 +282,19 @@ export default function Services({
             <span className="text-xs font-mono tracking-widest text-signature uppercase">
               02 / What We Build
             </span>
-            <h2 className="text-3xl md:text-5xl font-extrabold tracking-tight text-white font-sora">
-              AI Automations & Skills
-            </h2>
+            <WordReveal 
+              text="AI Automations & Skills" 
+              className="text-3xl md:text-5xl font-extrabold tracking-tight text-white font-sora"
+            />
             <p className="text-base text-text-tertiary leading-relaxed">
               We deploy custom-configured autonomous modules designed to run under one roof, integrating cleanly with your current business workflow.
             </p>
           </div>
 
-          {/* Services Cards Grid */}
+          {/* Desktop Version: 3-Column Grid */}
           <motion.div 
             variants={containerVariants}
-            className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
+            className="hidden lg:grid grid-cols-3 gap-6"
           >
             {BRAND_CONFIG.services.map((service) => (
               <motion.div
@@ -244,6 +330,72 @@ export default function Services({
               </motion.div>
             ))}
           </motion.div>
+
+          {/* Mobile Version: Horizontal Touch Snapping Slider */}
+          <div className="block lg:hidden w-full relative">
+            <div 
+              ref={sliderRef}
+              onScroll={handleScroll}
+              className="flex gap-6 overflow-x-auto snap-x snap-mandatory scrollbar-none pb-6 px-4 -mx-4 scroll-smooth"
+            >
+              {BRAND_CONFIG.services.map((service, index) => {
+                const isActive = index === activeMobileIndex;
+                return (
+                  <div 
+                    key={service.id}
+                    className="w-[85vw] sm:w-[50vw] shrink-0 snap-center transition-all duration-500 ease-out"
+                    style={{
+                      transform: isActive ? "scale(1)" : "scale(0.95)",
+                      opacity: isActive ? 1 : 0.4,
+                    }}
+                  >
+                    <CornerBorders className="h-[380px] p-6 bg-surface-raised/40 backdrop-blur-sm border-border-custom/20 flex flex-col justify-between">
+                      <div className="flex flex-col gap-4">
+                        {/* Icon */}
+                        <div className="p-3 bg-signature/5 w-fit rounded-lg border border-signature/20">
+                          {getIcon(service.id, isActive)}
+                        </div>
+                        
+                        {/* Title */}
+                        <h3 className={`text-xl font-bold tracking-tight font-sora transition-colors duration-300 ${
+                          isActive ? "text-signature" : "text-white"
+                        }`}>
+                          {service.title}
+                        </h3>
+                        
+                        {/* Description */}
+                        <p className="text-sm text-text-tertiary leading-relaxed line-clamp-4">
+                          {service.description}
+                        </p>
+                      </div>
+
+                      {/* Custom indicator */}
+                      <div className="text-[10px] font-mono text-text-tertiary/40 pt-4 border-t border-border-custom/20">
+                        AI_BUDDIES // 0{index + 1}
+                      </div>
+                    </CornerBorders>
+                  </div>
+                );
+              })}
+            </div>
+
+            {/* Pagination Indicator Dots */}
+            <div className="flex justify-center gap-2.5 mt-4">
+              {BRAND_CONFIG.services.map((_, index) => (
+                <button
+                  key={index}
+                  onClick={() => scrollToCard(index)}
+                  className={`h-2 rounded-full transition-all duration-300 ${
+                    index === activeMobileIndex 
+                      ? "w-8 bg-signature" 
+                      : "w-2 bg-border-custom/35"
+                  }`}
+                  aria-label={`Go to slide ${index + 1}`}
+                />
+              ))}
+            </div>
+          </div>
+
         </motion.div>
       </div>
     </section>

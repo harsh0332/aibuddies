@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
+import { motion } from "framer-motion";
 import Logo from "./logo";
 import { BRAND_CONFIG } from "@/config/content";
 import { Menu, X } from "lucide-react";
@@ -33,7 +34,12 @@ export default function Navbar() {
   };
 
   return (
-    <header className="sticky top-0 z-50 w-full px-4 pt-4 md:px-8 md:pt-6 transition-all duration-300 pointer-events-none">
+    <motion.header
+      initial={{ opacity: 0, y: -50 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
+      className="sticky top-0 z-50 w-full px-4 pt-4 md:px-8 md:pt-6 transition-all duration-300 pointer-events-none"
+    >
       <nav 
         className={`mx-auto max-w-5xl flex items-center justify-between px-6 py-3 rounded-full transition-all duration-500 pointer-events-auto glass-panel ${
           isScrolled 
@@ -116,6 +122,6 @@ export default function Navbar() {
           </ul>
         </div>
       )}
-    </header>
+    </motion.header>
   );
 }

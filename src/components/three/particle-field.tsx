@@ -38,24 +38,116 @@ function generateSphere(count: number, radius: number): Float32Array {
   return arr;
 }
 
-// 2. Torus (AI Chatbots)
-function generateTorus(count: number, R: number, r: number): Float32Array {
+// 2. Chat Bubble (AI Chatbots)
+function generateChatBubble(count: number, radius: number): Float32Array {
   const arr = new Float32Array(count * 3);
-  const segmentsU = 80;
-  const segmentsV = count / segmentsU;
+  for (let i = 0; i < count; i++) {
+    const theta = (i / count) * 2 * Math.PI;
+    const thickness = (Math.random() - 0.5) * 0.25; // Z depth thickness
+    
+    let x = 0;
+    let y = 0;
+    
+    // Bottom left corner tail is around theta = 4.3 to 4.7
+    if (theta > 4.3 && theta < 4.7) {
+      const peak = 1 - Math.abs((theta - 4.5) / 0.2); // 0 at edges, 1 at 4.5
+      const r = radius * (1.0 + peak * 0.45);
+      x = Math.cos(theta) * r;
+      y = Math.sin(theta) * r;
+    } else {
+      x = Math.cos(theta) * radius;
+      y = Math.sin(theta) * radius;
+    }
+    
+    // Add some random inner fill particles to make it look solid
+    if (Math.random() < 0.2) {
+      const rFactor = Math.random();
+      x *= rFactor;
+      y *= rFactor;
+    }
+    
+    const idx = i * 3;
+    arr[idx] = x;
+    arr[idx + 1] = y;
+    arr[idx + 2] = thickness;
+  }
+  return arr;
+}
+
+// 3. Network Hub / Connected Nodes (WhatsApp Automation)
+function generateNetworkHub(count: number): Float32Array {
+  const arr = new Float32Array(count * 3);
+  const nodeCount = 5;
+  const nodes = [];
+  
+  for (let n = 0; n < nodeCount; n++) {
+    const theta = (n / nodeCount) * 2 * Math.PI;
+    nodes.push({
+      x: Math.cos(theta) * 1.8,
+      y: Math.sin(theta) * 1.8,
+      z: (Math.random() - 0.5) * 0.5
+    });
+  }
 
   for (let i = 0; i < count; i++) {
-    const uIndex = i % segmentsU;
-    const vIndex = Math.floor(i / segmentsU);
-
-    const u = (uIndex / segmentsU) * 2 * Math.PI;
-    const v = (vIndex / segmentsV) * 2 * Math.PI;
-
-    const x = (R + r * Math.cos(u)) * Math.cos(v);
-    const y = r * Math.sin(u);
-    const z = (R + r * Math.cos(u)) * Math.sin(v);
-
     const idx = i * 3;
+    const r = i / count;
+    
+    if (r < 0.4) {
+      // Central Core Sphere
+      const theta = Math.random() * 2 * Math.PI;
+      const phi = Math.acos((Math.random() * 2) - 1);
+      const rad = Math.random() * 0.5;
+      
+      arr[idx] = rad * Math.sin(phi) * Math.cos(theta);
+      arr[idx + 1] = rad * Math.sin(phi) * Math.sin(theta);
+      arr[idx + 2] = rad * Math.cos(phi);
+    } else if (r < 0.75) {
+      // Outer Nodes
+      const nodeIdx = Math.floor(Math.random() * nodeCount);
+      const node = nodes[nodeIdx];
+      
+      const theta = Math.random() * 2 * Math.PI;
+      const phi = Math.acos((Math.random() * 2) - 1);
+      const rad = Math.random() * 0.18;
+      
+      arr[idx] = node.x + rad * Math.sin(phi) * Math.cos(theta);
+      arr[idx + 1] = node.y + rad * Math.sin(phi) * Math.sin(theta);
+      arr[idx + 2] = node.z + rad * Math.cos(phi);
+    } else {
+      // Connection Lines
+      const nodeIdx = Math.floor(Math.random() * nodeCount);
+      const node = nodes[nodeIdx];
+      
+      const progress = Math.random();
+      const jitterX = (Math.random() - 0.5) * 0.05;
+      const jitterY = (Math.random() - 0.5) * 0.05;
+      const jitterZ = (Math.random() - 0.5) * 0.05;
+      
+      arr[idx] = node.x * progress + jitterX;
+      arr[idx + 1] = node.y * progress + jitterY;
+      arr[idx + 2] = node.z * progress + jitterZ;
+    }
+  }
+  return arr;
+}
+
+// 4. Sound Waves / Sine ripples (Voice Agents)
+function generateSoundWaves(count: number): Float32Array {
+  const arr = new Float32Array(count * 3);
+  const channels = 4;
+  
+  for (let i = 0; i < count; i++) {
+    const idx = i * 3;
+    const channelIdx = i % channels;
+    const x = ((i / count) - 0.5) * 4.4;
+    
+    const channelY = (channelIdx - (channels - 1) / 2) * 0.6;
+    const freq = 2.5 + channelIdx * 0.8;
+    const amp = 0.35 - channelIdx * 0.05;
+    const y = channelY + Math.sin(x * freq) * amp;
+    const z = (Math.random() - 0.5) * 0.3;
+    
     arr[idx] = x;
     arr[idx + 1] = y;
     arr[idx + 2] = z;
@@ -63,21 +155,37 @@ function generateTorus(count: number, R: number, r: number): Float32Array {
   return arr;
 }
 
-// 3. Grid Lattice (WhatsApp Automation)
-function generateGridLattice(count: number, size: number): Float32Array {
+// 5. Target Bullseye / Concentric Rings (Lead Qualification)
+function generateTargetBullseye(count: number): Float32Array {
   const arr = new Float32Array(count * 3);
-  const N = Math.ceil(Math.pow(count, 1 / 3)); // 16 for 4000
-
+  
   for (let i = 0; i < count; i++) {
-    const ix = i % N;
-    const iy = Math.floor((i % (N * N)) / N);
-    const iz = Math.floor(i / (N * N));
-
-    const x = (ix / (N - 1) - 0.5) * size;
-    const y = (iy / (N - 1) - 0.5) * size;
-    const z = (iz / (N - 1) - 0.5) * size;
-
     const idx = i * 3;
+    const r = i / count;
+    
+    let x = 0;
+    let y = 0;
+    let z = (Math.random() - 0.5) * 0.15;
+    
+    if (r < 0.7) {
+      const ringIdx = Math.floor(Math.random() * 3);
+      const ringRadius = ringIdx === 0 ? 0.5 : ringIdx === 1 ? 1.2 : 1.9;
+      const theta = Math.random() * 2 * Math.PI;
+      x = Math.cos(theta) * ringRadius;
+      y = Math.sin(theta) * ringRadius;
+    } else {
+      const lineIdx = Math.random() < 0.5 ? 0 : 1;
+      const pos = ((Math.random() - 0.5) * 4.0);
+      
+      if (lineIdx === 0) {
+        x = pos;
+        y = (Math.random() - 0.5) * 0.05;
+      } else {
+        x = (Math.random() - 0.5) * 0.05;
+        y = pos;
+      }
+    }
+    
     arr[idx] = x;
     arr[idx + 1] = y;
     arr[idx + 2] = z;
@@ -85,67 +193,31 @@ function generateGridLattice(count: number, size: number): Float32Array {
   return arr;
 }
 
-// 4. Helix / DNA (Voice Agents)
-function generateHelix(count: number, radius: number, heightVal: number): Float32Array {
+// 6. Gear Wheel / Automated Support (AI Customer Support)
+function generateGearWheel(count: number): Float32Array {
   const arr = new Float32Array(count * 3);
-  const half = count / 2;
-
+  
   for (let i = 0; i < count; i++) {
-    const isSecondStrand = i >= half;
-    const subIdx = isSecondStrand ? i - half : i;
-    const t = subIdx / half;
-
-    const angle = t * 6 * Math.PI;
-    const h = (t - 0.5) * heightVal;
-    const strandPhase = isSecondStrand ? Math.PI : 0;
-
-    const x = radius * Math.cos(angle + strandPhase);
-    const y = h;
-    const z = radius * Math.sin(angle + strandPhase);
-
     const idx = i * 3;
-    arr[idx] = x;
-    arr[idx + 1] = y;
-    arr[idx + 2] = z;
-  }
-  return arr;
-}
-
-// 5. Cone / Spiral (Lead Qualification)
-function generateCone(count: number, radius: number, heightVal: number): Float32Array {
-  const arr = new Float32Array(count * 3);
-
-  for (let i = 0; i < count; i++) {
-    const t = i / count;
-    const angle = t * 16 * Math.PI;
-    const r = (1 - t) * radius;
-    const h = (t - 0.5) * heightVal;
-
-    const x = r * Math.cos(angle);
-    const y = h;
-    const z = r * Math.sin(angle);
-
-    const idx = i * 3;
-    arr[idx] = x;
-    arr[idx + 1] = y;
-    arr[idx + 2] = z;
-  }
-  return arr;
-}
-
-// 6. Ring Galaxy (AI Customer Support)
-function generateGalaxy(count: number, maxRadius: number): Float32Array {
-  const arr = new Float32Array(count * 3);
-
-  for (let i = 0; i < count; i++) {
-    const t = i / count;
-    const angle = t * 24 * Math.PI;
-    const r = Math.sqrt(t) * maxRadius;
-    const x = r * Math.cos(angle + r * 0.5);
-    const y = (Math.random() - 0.5) * 0.25;
-    const z = r * Math.sin(angle + r * 0.5);
-
-    const idx = i * 3;
+    const theta = (i / count) * 2 * Math.PI;
+    const z = (Math.random() - 0.5) * 0.4;
+    const isInner = Math.random() < 0.25;
+    
+    let r = 0;
+    if (isInner) {
+      r = 0.45;
+    } else {
+      const baseR = 1.3;
+      const toothAmp = 0.28;
+      const teethCount = 8;
+      const toothSignal = Math.sign(Math.sin(teethCount * theta)) * 0.5 + 0.5;
+      r = baseR + toothSignal * toothAmp;
+      r += (Math.random() - 0.5) * 0.05;
+    }
+    
+    const x = Math.cos(theta) * r;
+    const y = Math.sin(theta) * r;
+    
     arr[idx] = x;
     arr[idx + 1] = y;
     arr[idx + 2] = z;
@@ -155,17 +227,20 @@ function generateGalaxy(count: number, maxRadius: number): Float32Array {
 
 function Particles() {
   const pointsRef = useRef<THREE.Points>(null);
+  const parentGroupRef = useRef<THREE.Group>(null);
   const { viewport } = useThree();
+  const stageRef = useRef<number>(0);
+  const dampenedMouse = useRef(new THREE.Vector3(0, 0, 0));
 
   // 1. Generate position shapes once and spatially sort them by Y coordinate
   const shapes = useMemo(() => {
     const rawShapes = [
       generateSphere(PARTICLE_COUNT, SPHERE_RADIUS),
-      generateTorus(PARTICLE_COUNT, 2.0, 0.5),
-      generateGridLattice(PARTICLE_COUNT, 2.5),
-      generateHelix(PARTICLE_COUNT, 1.2, 3.2),
-      generateCone(PARTICLE_COUNT, 1.8, 3.0),
-      generateGalaxy(PARTICLE_COUNT, 2.4),
+      generateChatBubble(PARTICLE_COUNT, 1.8),
+      generateNetworkHub(PARTICLE_COUNT),
+      generateSoundWaves(PARTICLE_COUNT),
+      generateTargetBullseye(PARTICLE_COUNT),
+      generateGearWheel(PARTICLE_COUNT),
     ];
 
     // Spatially sort coordinates by Y value to ensure clean wave morph transitions
@@ -211,9 +286,12 @@ function Particles() {
     const points = pointsRef.current;
     const geometry = points.geometry;
     const positions = geometry.attributes.position.array as Float32Array;
+    const time = state.clock.getElapsedTime();
 
-    // Read stage directly from window to avoid React re-renders and repaint loops
-    const stage = (window as any).scrollStage !== undefined ? (window as any).scrollStage : 0;
+    // Read targetStage from window and smoothly interpolate it in the frame loop
+    const targetStage = (window as any).targetStage !== undefined ? (window as any).targetStage : 0;
+    stageRef.current = THREE.MathUtils.lerp(stageRef.current, targetStage, 0.08);
+    const stage = stageRef.current;
 
     // Toggle points visible state based on stage (unmounted stage threshold = 5.3)
     const isHidden = stage >= 5.3;
@@ -224,17 +302,18 @@ function Particles() {
     // Slow rotation
     points.rotation.y += delta * ROTATION_SPEED;
 
-    // Calculate mouse repel locally if stage < 0.8 (Hero)
-    const isRepelling = stage < 0.8;
+    // Calculate mouse interaction locally if stage < 0.8 (Hero)
+    const isInteracting = stage < 0.8;
     let localMouse = new THREE.Vector3();
 
-    if (isRepelling) {
+    if (isInteracting) {
       const mouseWorld = new THREE.Vector3(
         state.pointer.x * (viewport.width / 2),
         state.pointer.y * (viewport.height / 2),
         0
       );
-      localMouse.copy(mouseWorld);
+      dampenedMouse.current.lerp(mouseWorld, 0.08);
+      localMouse.copy(dampenedMouse.current);
       points.updateMatrixWorld();
       const localMatrix = points.matrixWorld.clone().invert();
       localMouse.applyMatrix4(localMatrix);
@@ -264,31 +343,41 @@ function Particles() {
       let targetY = targetBaseY * (1 - ratio) + targetNextY * ratio;
       let targetZ = targetBaseZ * (1 - ratio) + targetNextZ * ratio;
 
-      // 2. Mouse repel calculations (Hero mode only)
-      if (isRepelling) {
-        const cx = positions[idx];
-        const cy = positions[idx + 1];
-        const cz = positions[idx + 2];
+      // Calculate particle radial normal direction from origin (for organic wave ripples)
+      const baseLen = Math.sqrt(targetX * targetX + targetY * targetY + targetZ * targetZ) || 0.001;
+      const nx = targetX / baseLen;
+      const ny = targetY / baseLen;
+      const nz = targetZ / baseLen;
 
-        const dx = cx - localMouse.x;
-        const dy = cy - localMouse.y;
-        const dz = cz - localMouse.z;
+      // A. Constant organic background breathing (makes the sphere feel alive)
+      const breathe = Math.sin(time * 1.8 + baseLen * 2) * 0.04;
+      targetX += nx * breathe;
+      targetY += ny * breathe;
+      targetZ += nz * breathe;
+
+      // B. Mouse spotlight dent & warp (Hero mode only)
+      if (isInteracting) {
+        // Vector from particle base target position to mouse position
+        const dx = localMouse.x - targetX;
+        const dy = localMouse.y - targetY;
+        const dz = localMouse.z - targetZ;
         const dist = Math.sqrt(dx * dx + dy * dy + dz * dz);
 
-        if (dist < REPEL_RADIUS) {
-          const force = (1 - dist / REPEL_RADIUS) * REPEL_FORCE;
-          let vx = dx;
-          let vy = dy;
-          let vz = dz;
+        const INFLUENCE_RADIUS = 2.4;
 
-          const len = Math.sqrt(vx * vx + vy * vy + vz * vz) || 0.001;
-          vx /= len;
-          vy /= len;
-          vz /= len;
+        if (dist < INFLUENCE_RADIUS) {
+          const tFactor = 1.0 - dist / INFLUENCE_RADIUS;
+          
+          // Indentation: push particles INWARDS (towards center of sphere)
+          // Using a smooth quadratic curve for organic crater indent
+          const dentForce = -0.55 * tFactor * tFactor;
+          
+          // Attraction: pull particles gently towards the cursor's spatial coordinates
+          const pullForce = 0.15 * tFactor * tFactor;
 
-          targetX = targetX + vx * force;
-          targetY = targetY + vy * force;
-          targetZ = targetZ + vz * force;
+          targetX += nx * dentForce + (localMouse.x - targetX) * pullForce;
+          targetY += ny * dentForce + (localMouse.y - targetY) * pullForce;
+          targetZ += nz * dentForce + (localMouse.z - targetZ) * pullForce;
         }
       }
 
@@ -311,21 +400,41 @@ function Particles() {
     const targetGroupY = -viewport.height * 0.05 * t;
     const targetScale = 1.0 * (1 - t) + 1.25 * t;
 
-    points.position.x = THREE.MathUtils.lerp(points.position.x, targetGroupX, 0.08);
-    points.position.y = THREE.MathUtils.lerp(points.position.y, targetGroupY, 0.08);
-    
-    points.scale.setScalar(THREE.MathUtils.lerp(points.scale.x, targetScale, 0.08));
+    // Apply translations and scales to parent group
+    if (parentGroupRef.current) {
+      const parentGroup = parentGroupRef.current;
+      
+      // Decoupled smooth mouse-parallax shift to parent group position (only in Hero section, stage < 0.8)
+      const parallaxX = isInteracting ? state.pointer.x * (viewport.width * 0.07) : 0;
+      const parallaxY = isInteracting ? state.pointer.y * (viewport.height * 0.07) : 0;
 
-    // Group tilt based on mouse pointer coordinates (Hero mode only)
-    if (stage < 0.8) {
-      const targetTiltX = state.pointer.y * 0.25;
-      const targetTiltZ = -state.pointer.x * 0.25;
-      points.rotation.x = THREE.MathUtils.lerp(points.rotation.x, targetTiltX, 0.08);
-      points.rotation.z = THREE.MathUtils.lerp(points.rotation.z, targetTiltZ, 0.08);
-    } else {
-      points.rotation.x = THREE.MathUtils.lerp(points.rotation.x, 0, 0.08);
-      points.rotation.z = THREE.MathUtils.lerp(points.rotation.z, 0, 0.08);
+      parentGroup.position.x = THREE.MathUtils.lerp(parentGroup.position.x, targetGroupX + parallaxX, 0.08);
+      parentGroup.position.y = THREE.MathUtils.lerp(parentGroup.position.y, targetGroupY + parallaxY, 0.08);
+      parentGroup.scale.setScalar(THREE.MathUtils.lerp(parentGroup.scale.x, targetScale, 0.08));
+
+      // Decoupled 3D LookAt / Tilt (only on Hero stage)
+      if (isInteracting) {
+        // Rotate around X based on mouse Y (look up/down)
+        const targetTiltX = -state.pointer.y * 0.35;
+        // Rotate around Y based on mouse X (look left/right)
+        const targetTiltY = state.pointer.x * 0.35;
+
+        parentGroup.rotation.x = THREE.MathUtils.lerp(parentGroup.rotation.x, targetTiltX, 0.08);
+        parentGroup.rotation.y = THREE.MathUtils.lerp(parentGroup.rotation.y, targetTiltY, 0.08);
+        parentGroup.rotation.z = THREE.MathUtils.lerp(parentGroup.rotation.z, 0, 0.08);
+      } else {
+        // Reset tilt on stage transition
+        parentGroup.rotation.x = THREE.MathUtils.lerp(parentGroup.rotation.x, 0, 0.08);
+        parentGroup.rotation.y = THREE.MathUtils.lerp(parentGroup.rotation.y, 0, 0.08);
+        parentGroup.rotation.z = THREE.MathUtils.lerp(parentGroup.rotation.z, 0, 0.08);
+      }
     }
+
+    // Keep child points clean: handles Y spin and resets any other values to prevent double transformations
+    points.rotation.x = 0;
+    points.rotation.z = 0;
+    points.position.set(0, 0, 0);
+    points.scale.setScalar(1);
 
     // Calculate material opacity based on stage and write directly to material property
     let opacity = 0.85;
@@ -338,23 +447,25 @@ function Particles() {
   });
 
   return (
-    <points ref={pointsRef}>
-      <bufferGeometry>
-        <bufferAttribute
-          attach="attributes-position"
-          args={[currentPositions, 3]}
+    <group ref={parentGroupRef}>
+      <points ref={pointsRef}>
+        <bufferGeometry>
+          <bufferAttribute
+            attach="attributes-position"
+            args={[currentPositions, 3]}
+          />
+        </bufferGeometry>
+        <pointsMaterial
+          color="#43C2D8"
+          size={0.025}
+          transparent={true}
+          opacity={0.85}
+          blending={THREE.AdditiveBlending}
+          depthWrite={false}
+          sizeAttenuation={true}
         />
-      </bufferGeometry>
-      <pointsMaterial
-        color="#43C2D8"
-        size={0.025}
-        transparent={true}
-        opacity={0.85}
-        blending={THREE.AdditiveBlending}
-        depthWrite={false}
-        sizeAttenuation={true}
-      />
-    </points>
+      </points>
+    </group>
   );
 }
 
