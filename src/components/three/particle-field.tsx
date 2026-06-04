@@ -286,9 +286,9 @@ function Particles() {
           vy /= len;
           vz /= len;
 
-          targetX = targetX + vx * force + jitterOffsets[idx] * force;
-          targetY = targetY + vy * force + jitterOffsets[idx + 1] * force;
-          targetZ = targetZ + vz * force + jitterOffsets[idx + 2] * force;
+          targetX = targetX + vx * force;
+          targetY = targetY + vy * force;
+          targetZ = targetZ + vz * force;
         }
       }
 

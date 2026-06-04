@@ -22,7 +22,7 @@ export default function Hero({ is3DActive = false }: HeroProps) {
   };
 
   const itemVariants = {
-    hidden: { opacity: 0, y: 30 },
+    hidden: { opacity: 0, y: 24 },
     visible: {
       opacity: 1,
       y: 0,
