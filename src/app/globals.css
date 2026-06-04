@@ -1,0 +1,104 @@
+@import "tailwindcss";
+
+@theme {
+  --color-background: #000000;
+  --color-foreground: #ffffff;
+  
+  --color-surface-base: #000000;
+  --color-surface-raised: #0a0a0b;
+  --color-surface-muted: #131316;
+  --color-border-custom: #242428;
+
+  --color-text-primary: #ffffff;
+  --color-text-secondary: #f2f2f2;
+  --color-text-tertiary: #9a9aa2;
+
+  --color-signature: #8b7fff;
+  --color-whatsapp: #25D366;
+
+  --font-sora: var(--font-sora), var(--font-geist-sans), sans-serif;
+  --font-sans: var(--font-geist-sans), sans-serif;
+
+  --radius-sm-custom: 12px;
+  --radius-lg-custom: 32px;
+  --radius-xl-custom: 40px;
+  --radius-pill: 9999px;
+
+  --animate-pulse-slow: pulse-slow 4s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+  --animate-glow-pulse: glow-pulse 6s ease-in-out infinite;
+
+  @keyframes pulse-slow {
+    0%, 100% { opacity: 1; }
+    50% { opacity: .5; }
+  }
+  @keyframes glow-pulse {
+    0%, 100% { opacity: 0.1; filter: blur(80px); transform: translate(0, 0) scale(1); }
+    33% { opacity: 0.2; filter: blur(100px); transform: translate(30px, -50px) scale(1.1); }
+    66% { opacity: 0.15; filter: blur(90px); transform: translate(-20px, 40px) scale(0.95); }
+  }
+}
+
+:root {
+  --background: #000000;
+  --foreground: #ffffff;
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+}
+::-webkit-scrollbar-track {
+  background: #000000;
+}
+::-webkit-scrollbar-thumb {
+  background: #242428;
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #8b7fff;
+}
+
+html {
+  scroll-behavior: smooth;
+  background-color: #000000;
+  color: #ffffff;
+  overflow-x: hidden;
+}
+
+body {
+  background-color: #000000;
+  color: #ffffff;
+  font-family: var(--font-geist-sans), sans-serif;
+  overflow-x: hidden;
+  position: relative;
+  min-height: 100vh;
+}
+
+/* Glassmorphism Panel */
+.glass-panel {
+  background: rgba(10, 10, 11, 0.75);
+  backdrop-filter: blur(16px) saturate(160%);
+  -webkit-backdrop-filter: blur(16px) saturate(160%);
+  border: 1px solid rgba(36, 36, 40, 0.6);
+}
+
+/* Custom interactive cursors support */
+@media (pointer: fine) {
+  body, a, button, input, select, textarea, [role="button"], label {
+    cursor: none !important;
+  }
+}
+
+/* Visible Keyboard Focus Rings */
+*:focus-visible {
+  outline: 2px solid #8b7fff !important;
+  outline-offset: 4px !important;
+}
+
+/* Dynamic Grid Background Accent */
+.bg-grid-pattern {
+  background-size: 40px 40px;
+  background-image: 
+    linear-gradient(to right, rgba(36, 36, 40, 0.25) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(36, 36, 40, 0.25) 1px, transparent 1px);
+}
