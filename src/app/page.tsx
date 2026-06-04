@@ -30,13 +30,13 @@ const ParticleField = dynamic(() => import("@/components/three/particle-field"),
 export default function Home() {
   const [isLoading, setIsLoading] = useState(true);
   const [is3DActive, setIs3DActive] = useState(false);
-  const [stage, setStage] = useState(0);
   const [activeIndex, setActiveIndex] = useState(0);
 
   // Auto-scroll to top on initial mounting / refresh
   useEffect(() => {
     if (typeof window !== "undefined") {
       window.scrollTo(0, 0);
+      (window as any).scrollStage = 0;
     }
   }, []);
 
@@ -84,6 +84,7 @@ export default function Home() {
     if (prefersReducedMotion) return;
 
     let ctx: any;
+    let scrollTriggerUpdateHandler: any;
 
     // Dynamically import GSAP and ScrollTrigger on client side
     Promise.all([
@@ -95,7 +96,8 @@ export default function Home() {
       // Connect Lenis events to ScrollTrigger
       const lenis = (window as any).lenisInstance;
       if (lenis) {
-        lenis.on("scroll", ScrollTrigger.update);
+        scrollTriggerUpdateHandler = ScrollTrigger.update;
+        lenis.on("scroll", scrollTriggerUpdateHandler);
       }
 
       ctx = gsap.context(() => {
@@ -137,7 +139,7 @@ export default function Home() {
             end: "top top",
             scrub: true,
             onUpdate: (self) => {
-              setStage(self.progress); // 0.0 -> 1.0
+              (window as any).scrollStage = self.progress; // 0.0 -> 1.0 (written directly to window for R3F)
             },
           });
 
@@ -149,12 +151,12 @@ export default function Home() {
             scrub: true,
             onUpdate: (self) => {
               const currentStage = 1.0 + self.progress * 4.0;
-              setStage(currentStage);
+              (window as any).scrollStage = currentStage; // 1.0 -> 5.0 (written directly to window for R3F)
               
-              // Map progress to active index for 5 services (0..4)
+              // Throttle React state updates to only fire when activeIndex actually changes
               const p = self.progress;
               const index = Math.min(Math.floor(p * 5), 4);
-              setActiveIndex(index);
+              setActiveIndex((prev) => (prev !== index ? index : prev));
             },
           });
 
@@ -180,7 +182,7 @@ export default function Home() {
             end: "top 50%",
             scrub: true,
             onUpdate: (self) => {
-              setStage(5.0 + self.progress * 0.5);
+              (window as any).scrollStage = 5.0 + self.progress * 0.5; // 5.0 -> 5.5 (written directly to window for R3F)
             },
           });
         }
@@ -189,8 +191,16 @@ export default function Home() {
 
     return () => {
       if (ctx) ctx.revert();
+      
+      // Clean up the Lenis scroll event listener to prevent leaks
+      const currentLenis = (window as any).lenisInstance;
+      if (currentLenis && scrollTriggerUpdateHandler) {
+        currentLenis.off("scroll", scrollTriggerUpdateHandler);
+      }
+
       if (typeof window !== "undefined") {
         delete (window as any).scrollToService;
+        delete (window as any).scrollStage;
       }
     };
   }, [isLoading, is3DActive]);
@@ -204,8 +214,8 @@ export default function Home() {
         )}
       </AnimatePresence>
 
-      {/* Global background 3D particle canvas */}
-      {is3DActive && !isLoading && <ParticleField stage={stage} />}
+      {/* Global background 3D particle canvas (bypasses props, reads scroll stage from window inside R3F) */}
+      {is3DActive && !isLoading && <ParticleField />}
 
       {/* Main App Page Content - always rendered in DOM for SEO & LCP */}
       <motion.div
@@ -217,10 +227,16 @@ export default function Home() {
         {/* Header sticky navigation */}
         <Navbar />
 
-        {/* Staggered Sections stack */}
+        {/* Staggered Sections stack with explicit opaque layering contexts */}
         <main className="flex-1 w-full flex flex-col">
           <Hero is3DActive={is3DActive} />
-          <About />
+          
+          {/* About section: opaque layer covering fixed canvas */}
+          <div className="relative z-20 bg-surface-base">
+            <About />
+          </div>
+          
+          {/* Services section: transparent container for background canvas view */}
           <Services 
             interactive={is3DActive} 
             activeIndex={activeIndex} 
@@ -230,18 +246,24 @@ export default function Home() {
               }
             }}
           />
-          <Solutions />
-          <Process />
-          <Portfolio />
-          <WhyUs />
-          <Testimonials />
-          <FAQ />
-          <ContactForm />
-          <FinalCTA />
+          
+          {/* Solutions to CTAs block: opaque layer covering canvas and stacking above services sticky container */}
+          <div className="relative z-20 bg-[#020203]">
+            <Solutions />
+            <Process />
+            <Portfolio />
+            <WhyUs />
+            <Testimonials />
+            <FAQ />
+            <ContactForm />
+            <FinalCTA />
+          </div>
         </main>
 
-        {/* Footer branding */}
-        <Footer />
+        {/* Footer branding: opaque layer stacking above Services */}
+        <div className="relative z-20 bg-black">
+          <Footer />
+        </div>
       </motion.div>
     </>
   );

@@ -1,12 +1,12 @@
 "use client";
 
-import React, { useRef, useMemo, useEffect } from "react";
+import React, { useRef, useMemo } from "react";
 import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import * as THREE from "three";
 
 // EXPOSED TWEAK KNOBS
 export const PARTICLE_COUNT = 4000;
-export const SPHERE_RADIUS = 1.4;
+export const SPHERE_RADIUS = 1.4; // Reduced to fit perfectly beside left-aligned headline
 export const MORPH_LERP = 0.08;
 export const ROTATION_SPEED = 0.08;
 export const REPEL_RADIUS = 1.2;
@@ -153,17 +153,13 @@ function generateGalaxy(count: number, maxRadius: number): Float32Array {
   return arr;
 }
 
-interface ParticlesProps {
-  stage: number; // float value from 0 to 5
-}
-
-function Particles({ stage }: ParticlesProps) {
+function Particles() {
   const pointsRef = useRef<THREE.Points>(null);
   const { viewport } = useThree();
 
-  // 1. Generate position shapes once
+  // 1. Generate position shapes once and spatially sort them by Y coordinate
   const shapes = useMemo(() => {
-    return [
+    const rawShapes = [
       generateSphere(PARTICLE_COUNT, SPHERE_RADIUS),
       generateTorus(PARTICLE_COUNT, 2.0, 0.5),
       generateGridLattice(PARTICLE_COUNT, 2.5),
@@ -171,9 +167,31 @@ function Particles({ stage }: ParticlesProps) {
       generateCone(PARTICLE_COUNT, 1.8, 3.0),
       generateGalaxy(PARTICLE_COUNT, 2.4),
     ];
+
+    // Spatially sort coordinates by Y value to ensure clean wave morph transitions
+    const sortCoords = (arr: Float32Array) => {
+      const count = arr.length / 3;
+      const pts = [];
+      for (let i = 0; i < count; i++) {
+        const idx = i * 3;
+        pts.push({ x: arr[idx], y: arr[idx + 1], z: arr[idx + 2] });
+      }
+      pts.sort((a, b) => a.y - b.y);
+      
+      const sorted = new Float32Array(arr.length);
+      for (let i = 0; i < count; i++) {
+        const idx = i * 3;
+        sorted[idx] = pts[i].x;
+        sorted[idx + 1] = pts[i].y;
+        sorted[idx + 2] = pts[i].z;
+      }
+      return sorted;
+    };
+
+    return rawShapes.map(sortCoords);
   }, []);
 
-  // Allocate current running positions buffer initialized to sphere
+  // Allocate current running positions buffer initialized to sorted sphere
   const currentPositions = useMemo(() => {
     return new Float32Array(shapes[0]);
   }, [shapes]);
@@ -193,6 +211,15 @@ function Particles({ stage }: ParticlesProps) {
     const points = pointsRef.current;
     const geometry = points.geometry;
     const positions = geometry.attributes.position.array as Float32Array;
+
+    // Read stage directly from window to avoid React re-renders and repaint loops
+    const stage = (window as any).scrollStage !== undefined ? (window as any).scrollStage : 0;
+
+    // Toggle points visible state based on stage (unmounted stage threshold = 5.3)
+    const isHidden = stage >= 5.3;
+    points.visible = !isHidden;
+
+    if (isHidden) return;
 
     // Slow rotation
     points.rotation.y += delta * ROTATION_SPEED;
@@ -274,9 +301,7 @@ function Particles({ stage }: ParticlesProps) {
     geometry.attributes.position.needsUpdate = true;
 
     // Responsive 3D Position and Scale Interpolation based on stage
-    // Hero Group positioning: centers rightward.
-    // Services Group positioning: shifts further right.
-    const isHero = stage <= 1.0;
+    // Hero Group positioning: shifted further right to sit beside headline text without overflow
     const t = Math.min(Math.max(stage, 0), 1.0); // clamped 0..1 translation progress
 
     const heroX = viewport.width * 0.24;
@@ -301,15 +326,16 @@ function Particles({ stage }: ParticlesProps) {
       points.rotation.x = THREE.MathUtils.lerp(points.rotation.x, 0, 0.08);
       points.rotation.z = THREE.MathUtils.lerp(points.rotation.z, 0, 0.08);
     }
-  });
 
-  // Calculate material opacity based on stage:
-  // Fade out completely when scrolling past Services section into Solutions (stage 5.0 -> 5.5)
-  let opacity = 0.85;
-  if (stage > 4.8) {
-    // Fade from 0.85 to 0 as stage goes from 4.8 to 5.2
-    opacity = Math.max(0, 0.85 * (1 - (stage - 4.8) / 0.4));
-  }
+    // Calculate material opacity based on stage and write directly to material property
+    let opacity = 0.85;
+    if (stage > 4.8) {
+      opacity = Math.max(0, 0.85 * (1 - (stage - 4.8) / 0.4));
+    }
+    if (points.material) {
+      (points.material as THREE.PointsMaterial).opacity = opacity;
+    }
+  });
 
   return (
     <points ref={pointsRef}>
@@ -323,7 +349,7 @@ function Particles({ stage }: ParticlesProps) {
         color="#43C2D8"
         size={0.025}
         transparent={true}
-        opacity={opacity}
+        opacity={0.85}
         blending={THREE.AdditiveBlending}
         depthWrite={false}
         sizeAttenuation={true}
@@ -332,16 +358,7 @@ function Particles({ stage }: ParticlesProps) {
   );
 }
 
-interface ParticleFieldProps {
-  stage: number;
-}
-
-export default function ParticleField({ stage }: ParticleFieldProps) {
-  // Hide completely if opacity is driven to zero
-  const isHidden = stage >= 5.3;
-
-  if (isHidden) return null;
-
+export default function ParticleField() {
   return (
     <div className="fixed inset-0 w-full h-full pointer-events-none z-0 select-none bg-transparent">
       <Canvas
@@ -350,7 +367,7 @@ export default function ParticleField({ stage }: ParticleFieldProps) {
         style={{ pointerEvents: "none" }}
       >
         <ambientLight intensity={1.5} />
-        <Particles stage={stage} />
+        <Particles />
       </Canvas>
     </div>
   );

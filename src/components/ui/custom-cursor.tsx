@@ -80,22 +80,24 @@ export default function CustomCursor() {
 
     // Single requestAnimationFrame loop driving BOTH dot and ring positioning
     const render = () => {
-      // 1. Dot positioning with quick smoothing (lerp = 0.35)
-      const dotLerp = 0.35;
+      // 1. Snappy dot positioning (lerp = 0.65)
+      const dotLerp = 0.65;
       dotPosRef.current.x += (mouseRef.current.x - dotPosRef.current.x) * dotLerp;
       dotPosRef.current.y += (mouseRef.current.y - dotPosRef.current.y) * dotLerp;
 
       if (dotRef.current) {
-        dotRef.current.style.transform = `translate3d(${dotPosRef.current.x}px, ${dotPosRef.current.y}px, 0)`;
+        // Subtract half-width/height (4px for h-2 w-2 dot) to center precisely without CSS class conflicts
+        dotRef.current.style.transform = `translate3d(${dotPosRef.current.x - 4}px, ${dotPosRef.current.y - 4}px, 0)`;
       }
 
-      // 2. Ring positioning with smooth trailing (lerp = 0.20)
-      const ringLerp = 0.20;
+      // 2. Responsive ring trailing (lerp = 0.35)
+      const ringLerp = 0.35;
       ringPosRef.current.x += (mouseRef.current.x - ringPosRef.current.x) * ringLerp;
       ringPosRef.current.y += (mouseRef.current.y - ringPosRef.current.y) * ringLerp;
 
       if (ringRef.current) {
-        ringRef.current.style.transform = `translate3d(${ringPosRef.current.x}px, ${ringPosRef.current.y}px, 0)`;
+        // Subtract half-width/height (16px for h-8 w-8 ring) to center precisely without CSS class conflicts
+        ringRef.current.style.transform = `translate3d(${ringPosRef.current.x - 16}px, ${ringPosRef.current.y - 16}px, 0)`;
       }
 
       animationFrameRef.current = requestAnimationFrame(render);
@@ -120,20 +122,20 @@ export default function CustomCursor() {
 
   return (
     <>
-      {/* Inner Dot Wrapper: Pure translate3d, no transition */}
+      {/* Inner Dot Wrapper: Pure translate3d, no transition, centered in JS */}
       <div
         ref={dotRef}
-        className="pointer-events-none fixed left-0 top-0 z-[999] -translate-x-1/2 -translate-y-1/2 select-none mix-blend-difference"
+        className="pointer-events-none fixed left-0 top-0 z-[999] select-none mix-blend-difference"
         style={{ willChange: "transform" }}
       >
         {/* Visual Dot */}
         <div className="h-2 w-2 rounded-full bg-white" />
       </div>
 
-      {/* Outer Ring Wrapper: Pure translate3d, no transition */}
+      {/* Outer Ring Wrapper: Pure translate3d, no transition, centered in JS */}
       <div
         ref={ringRef}
-        className="pointer-events-none fixed left-0 top-0 z-[998] -translate-x-1/2 -translate-y-1/2 select-none"
+        className="pointer-events-none fixed left-0 top-0 z-[998] select-none"
         style={{ willChange: "transform" }}
       >
         {/* Visual Ring: Styled and scaled via CSS transitions */}
