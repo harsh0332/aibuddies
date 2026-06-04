@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import { AnimatePresence, motion } from "framer-motion";
+import dynamic from "next/dynamic";
 
 // UI Core Components
 import Loader from "@/components/ui/loader";
@@ -21,13 +22,32 @@ import FAQ from "@/components/sections/faq";
 import ContactForm from "@/components/sections/contact-form";
 import FinalCTA from "@/components/sections/final-cta";
 
+// Dynamically load R3F ParticleField to prevent SSR issues and optimize performance
+const ParticleField = dynamic(() => import("@/components/three/particle-field"), {
+  ssr: false,
+});
+
 export default function Home() {
   const [isLoading, setIsLoading] = useState(true);
+  const [is3DActive, setIs3DActive] = useState(false);
+  const [stage, setStage] = useState(0);
+  const [activeIndex, setActiveIndex] = useState(0);
 
   // Auto-scroll to top on initial mounting / refresh
   useEffect(() => {
     if (typeof window !== "undefined") {
       window.scrollTo(0, 0);
+    }
+  }, []);
+
+  // Detect 3D compatibility on client side (desktop non-touch with preferred motion)
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const isTouch = window.matchMedia("(pointer: coarse)").matches;
+      const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+      if (!isTouch && !prefersReducedMotion) {
+        setIs3DActive(true);
+      }
     }
   }, []);
 
@@ -108,24 +128,73 @@ export default function Home() {
           },
         });
 
-        gsap.to("#hero-canvas-wrap", {
-          y: 40,
-          scale: 0.98,
-          ease: "none",
-          scrollTrigger: {
-            trigger: "#hero",
-            start: "top top",
-            end: "bottom top",
+        // If 3D is active, setup scroll-triggered particle morphing triggers
+        if (is3DActive) {
+          // Trigger 1: Stage 0 -> 1: From Services entering bottom of screen to reaching top of screen
+          ScrollTrigger.create({
+            trigger: "#services",
+            start: "top bottom",
+            end: "top top",
             scrub: true,
-          },
-        });
+            onUpdate: (self) => {
+              setStage(self.progress); // 0.0 -> 1.0
+            },
+          });
+
+          // Trigger 2: Stage 1 -> 5: Pinned Services section
+          const servicesTrigger = ScrollTrigger.create({
+            trigger: "#services",
+            start: "top top",
+            end: "+=2500",
+            pin: true,
+            scrub: true,
+            onUpdate: (self) => {
+              const currentStage = 1.0 + self.progress * 4.0;
+              setStage(currentStage);
+              
+              // Map progress to active index for 5 services (0..4)
+              const p = self.progress;
+              const index = Math.min(Math.floor(p * 5), 4);
+              setActiveIndex(index);
+            },
+          });
+
+          // Expose scrollToService on window to allow card clicks to scroll smoothly
+          (window as any).scrollToService = (index: number) => {
+            const currentLenis = (window as any).lenisInstance;
+            if (currentLenis && servicesTrigger) {
+              const start = servicesTrigger.start;
+              const end = servicesTrigger.end;
+              // Target scroll is distributed evenly across pinned region
+              const targetScroll = start + (index / 4.0) * (end - start);
+              currentLenis.scrollTo(targetScroll, { 
+                duration: 1.2, 
+                ease: (t: number) => 1 - Math.pow(1 - t, 3) 
+              });
+            }
+          };
+
+          // Trigger 3: Stage 5 -> 5.5: Solutions section fade out
+          ScrollTrigger.create({
+            trigger: "#solutions",
+            start: "top bottom",
+            end: "top 50%",
+            scrub: true,
+            onUpdate: (self) => {
+              setStage(5.0 + self.progress * 0.5);
+            },
+          });
+        }
       });
     });
 
     return () => {
       if (ctx) ctx.revert();
+      if (typeof window !== "undefined") {
+        delete (window as any).scrollToService;
+      }
     };
-  }, [isLoading]);
+  }, [isLoading, is3DActive]);
 
   return (
     <>
@@ -135,6 +204,9 @@ export default function Home() {
           <Loader onComplete={() => setIsLoading(false)} />
         )}
       </AnimatePresence>
+
+      {/* Global background 3D particle canvas */}
+      {is3DActive && !isLoading && <ParticleField stage={stage} />}
 
       {/* Main App Page Content - always rendered in DOM for SEO & LCP */}
       <motion.div
@@ -148,9 +220,17 @@ export default function Home() {
 
         {/* Staggered Sections stack */}
         <main className="flex-1 w-full flex flex-col">
-          <Hero />
+          <Hero is3DActive={is3DActive} />
           <About />
-          <Services />
+          <Services 
+            interactive={is3DActive} 
+            activeIndex={activeIndex} 
+            onCardClick={(index) => {
+              if (is3DActive && (window as any).scrollToService) {
+                (window as any).scrollToService(index);
+              }
+            }}
+          />
           <Solutions />
           <Process />
           <Portfolio />

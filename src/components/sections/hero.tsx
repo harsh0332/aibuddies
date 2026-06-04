@@ -1,33 +1,15 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
-import dynamic from "next/dynamic";
+import React from "react";
 import { motion } from "framer-motion";
 import { BRAND_CONFIG } from "@/config/content";
 import { scrollToElement } from "@/components/ui/smooth-scroll-provider";
 
-// Lazy-load the Three.js Canvas to optimize initial load and avoid SSR issues
-const HeroCanvas = dynamic(() => import("./hero-canvas"), {
-  ssr: false,
-  loading: () => (
-    <div className="absolute inset-0 bg-[#000000] bg-[radial-gradient(circle_at_center,rgba(43,160,220,0.08),transparent_70%)]" />
-  ),
-});
+interface HeroProps {
+  is3DActive?: boolean;
+}
 
-export default function Hero() {
-  const [showCanvas, setShowCanvas] = useState(false);
-
-  useEffect(() => {
-    // Check user preferences to decide whether to run the heavy 3D canvas
-    const isTouch = window.matchMedia("(pointer: coarse)").matches;
-    const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-
-    // Show canvas only on non-touch desktop devices when reduced motion is disabled
-    if (!isTouch && !prefersReducedMotion) {
-      setShowCanvas(true);
-    }
-  }, []);
-
+export default function Hero({ is3DActive = false }: HeroProps) {
   const containerVariants = {
     hidden: { opacity: 0 },
     visible: {
@@ -59,7 +41,9 @@ export default function Hero() {
   return (
     <section 
       id="hero" 
-      className="relative min-h-[92vh] w-full flex items-center justify-start overflow-hidden pt-24 md:pt-32 pb-20 px-6 md:px-12 lg:px-24 bg-[#000000]"
+      className={`relative min-h-[92vh] w-full flex items-center justify-start overflow-hidden pt-24 md:pt-32 pb-20 px-6 md:px-12 lg:px-24 transition-colors duration-500 ${
+        is3DActive ? "bg-transparent" : "bg-[#000000]"
+      }`}
     >
       {/* Premium Light Beam / Ray Ambient Glows */}
       <div 
@@ -78,12 +62,8 @@ export default function Hero() {
         aria-hidden="true"
       />
 
-      {/* 3D Canvas or Radial Gradient Fallback */}
-      {showCanvas ? (
-        <div id="hero-canvas-wrap" className="absolute inset-0 w-full h-full z-0">
-          <HeroCanvas />
-        </div>
-      ) : (
+      {/* 3D Canvas Fallback background */}
+      {!is3DActive && (
         <div 
           className="absolute inset-0 bg-[#000000] bg-[radial-gradient(circle_at_center,rgba(43,160,220,0.12),transparent_60%)] z-0" 
           aria-hidden="true"
@@ -139,7 +119,7 @@ export default function Hero() {
 
           {/* Call to Action Buttons */}
           <motion.div 
-          variants={itemVariants}
+            variants={itemVariants}
             className="flex flex-wrap gap-4 mt-4"
           >
             <a
