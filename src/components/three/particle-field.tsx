@@ -6,7 +6,7 @@ import * as THREE from "three";
 
 // EXPOSED TWEAK KNOBS
 export const PARTICLE_COUNT = 4000;
-export const SPHERE_RADIUS = 2.0;
+export const SPHERE_RADIUS = 1.4;
 export const MORPH_LERP = 0.08;
 export const ROTATION_SPEED = 0.08;
 export const REPEL_RADIUS = 1.2;
@@ -279,8 +279,8 @@ function Particles({ stage }: ParticlesProps) {
     const isHero = stage <= 1.0;
     const t = Math.min(Math.max(stage, 0), 1.0); // clamped 0..1 translation progress
 
-    const heroX = viewport.width * 0.18;
-    const servicesX = viewport.width * 0.23;
+    const heroX = viewport.width * 0.24;
+    const servicesX = viewport.width * 0.26;
 
     const targetGroupX = heroX * (1 - t) + servicesX * t;
     const targetGroupY = -viewport.height * 0.05 * t;

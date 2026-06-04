@@ -68,10 +68,15 @@ export default function Services({
 
   if (interactive) {
     return (
-      <section 
-        id="services" 
-        className="py-20 md:py-28 px-6 md:px-12 lg:px-24 bg-transparent w-full min-h-screen flex items-center overflow-hidden"
+      <div 
+        id="services-container" 
+        className="relative w-full"
+        style={{ height: "300vh" }}
       >
+        <section 
+          id="services" 
+          className="sticky top-0 h-screen w-full flex items-center justify-center overflow-hidden py-20 md:py-28 px-6 md:px-12 lg:px-24 bg-transparent"
+        >
         <div className="max-w-6xl mx-auto w-full">
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16 items-start">
             {/* Left Column: Interactive vertical list */}
@@ -167,8 +172,9 @@ export default function Services({
             {/* Right Column: Transparent placeholder for 3D canvas (on desktop) */}
             <div className="col-span-1 lg:col-span-6 min-h-[300px] lg:min-h-[500px] pointer-events-none hidden lg:block" />
           </div>
-        </div>
-      </section>
+          </div>
+        </section>
+      </div>
     );
   }
 

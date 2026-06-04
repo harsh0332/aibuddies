@@ -132,7 +132,7 @@ export default function Home() {
         if (is3DActive) {
           // Trigger 1: Stage 0 -> 1: From Services entering bottom of screen to reaching top of screen
           ScrollTrigger.create({
-            trigger: "#services",
+            trigger: "#services-container",
             start: "top bottom",
             end: "top top",
             scrub: true,
@@ -141,12 +141,11 @@ export default function Home() {
             },
           });
 
-          // Trigger 2: Stage 1 -> 5: Pinned Services section
+          // Trigger 2: Stage 1 -> 5: Services section (driven by CSS sticky progress through container)
           const servicesTrigger = ScrollTrigger.create({
-            trigger: "#services",
+            trigger: "#services-container",
             start: "top top",
-            end: "+=2500",
-            pin: true,
+            end: "bottom bottom",
             scrub: true,
             onUpdate: (self) => {
               const currentStage = 1.0 + self.progress * 4.0;
@@ -165,7 +164,7 @@ export default function Home() {
             if (currentLenis && servicesTrigger) {
               const start = servicesTrigger.start;
               const end = servicesTrigger.end;
-              // Target scroll is distributed evenly across pinned region
+              // Target scroll is distributed evenly across sticky region
               const targetScroll = start + (index / 4.0) * (end - start);
               currentLenis.scrollTo(targetScroll, { 
                 duration: 1.2, 
