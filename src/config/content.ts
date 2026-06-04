@@ -87,7 +87,7 @@ export const BRAND_CONFIG = {
     {
       name: "Bluhawk Marketing",
       service: "Full Stack AI",
-      highlight: "Complete automation of client operations and administrative scheduling."
+      highlight: "AI Chatbots, WhatsApp Automation & Bot, Voice Agent, Lead Qualification, AI Customer Support."
     },
     {
       name: "MP Fertility Centre",
@@ -102,12 +102,12 @@ export const BRAND_CONFIG = {
     {
       name: "Host Dhanraj",
       service: "Full Stack AI",
-      highlight: "End-to-end automation of hosting services, server support triage, and user enquiries."
+      highlight: "AI Chatbots, WhatsApp Automation & Bot, Voice Agent, Lead Qualification, AI Customer Support."
     },
     {
       name: "InnovateX Media",
       service: "Full Stack AI",
-      highlight: "Automated media asset management, editorial scheduling, and social outreach workflows."
+      highlight: "Voice Agent, AI Chatbots, WhatsApp Automation & Bot, Lead Qualification, AI Customer Support."
     },
     {
       name: "Bizparadise10X",
@@ -143,22 +143,19 @@ export const BRAND_CONFIG = {
   // Testimonials (Scaffolded - EDITABLE)
   testimonials: [
     {
-      author: "Jane Doe", // EDIT: replace with real testimonial author name
-      role: "Operations Manager, MP Fertility", // EDIT: replace with real role
-      text: "The WhatsApp automation transformed our clinic booking. Patients get instant answers after-hours, and we have recorded zero missed enquiries since launch.", // EDIT: replace with real text
-      rating: 5
+      company: "MP Fertility Centre",
+      service: "WhatsApp Automation via n8n",
+      text: "After-hours AI voice agent, appointment booking and patient follow-ups — no enquiry goes unanswered, even outside clinic hours."
     },
     {
-      author: "John Smith", // EDIT: replace with real testimonial author name
-      role: "Founder, Bluhawk Marketing", // EDIT: replace with real role
-      text: "Integrating the Full Stack AI bundle saved our marketing team over 20 hours of manual data entry every single week. Highly recommend AI Buddies.", // EDIT: replace with real text
-      rating: 5
+      company: "DPM Entertainment Pvt. Ltd.",
+      service: "WhatsApp Automation via n8n",
+      text: "Client onboarding, broadcast campaigns and booking confirmations — entertainment bookings and client communication, all automated through WhatsApp."
     },
     {
-      author: "Alex Rivera", // EDIT: replace with real testimonial author name
-      role: "CEO, InnovateX Media", // EDIT: replace with real role
-      text: "Fast delivery is an understatement. We went live with our automation system within a week, and the results were measurable from day one.", // EDIT: replace with real text
-      rating: 5
+      company: "Bizparadise10X",
+      service: "Lead Engine",
+      text: "A lead engine with voice agents and AI chatbots that qualifies and nurtures prospects automatically, so the sales team focuses only on ready-to-buy clients."
     }
   ],
 
@@ -195,7 +192,7 @@ export const BRAND_CONFIG = {
     instagram: "@aibuddiess",
     whatsappLink: "https://wa.me/919516194751?text=Hi%20AI%20Buddies%2C%20I'd%20like%20to%20book%20a%20free%20call%20to%20automate%20my%20business.",
     instagramLink: "https://instagram.com/aibuddiess",
-    email: "contact@aibuddies.agency", // EDIT: replace with real support email
-    address: "India" // EDIT: replace with real office location
+    email: "", // Sanitized / Not displayed
+    address: "India"
   }
 };

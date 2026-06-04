@@ -73,6 +73,7 @@ export default function FAQ() {
                 >
                   <CornerBorders className="p-1 bg-surface-raised/40 backdrop-blur-sm transition-all duration-300 glow-border">
                     <button
+                      id={`faq-question-${index}`}
                       onClick={() => toggleFAQ(index)}
                       aria-expanded={isOpen}
                       aria-controls={`faq-answer-${index}`}
@@ -88,6 +89,8 @@ export default function FAQ() {
                       {isOpen && (
                         <motion.div
                           id={`faq-answer-${index}`}
+                          role="region"
+                          aria-labelledby={`faq-question-${index}`}
                           initial={{ height: 0, opacity: 0 }}
                           animate={{ 
                             height: "auto", 

@@ -55,6 +55,78 @@ export default function Home() {
     };
   }, [isLoading]);
 
+  // GSAP ScrollTrigger setup driven via Lenis
+  useEffect(() => {
+    if (isLoading) return;
+
+    // Check prefers-reduced-motion to disable scrub effects
+    const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    if (prefersReducedMotion) return;
+
+    let ctx: any;
+
+    // Dynamically import GSAP and ScrollTrigger on client side
+    Promise.all([
+      import("gsap"),
+      import("gsap/ScrollTrigger")
+    ]).then(([{ gsap }, { ScrollTrigger }]) => {
+      gsap.registerPlugin(ScrollTrigger);
+
+      // Connect Lenis events to ScrollTrigger
+      const lenis = (window as any).lenisInstance;
+      if (lenis) {
+        lenis.on("scroll", ScrollTrigger.update);
+      }
+
+      ctx = gsap.context(() => {
+        // 1. Process Timeline line fill scroll-tied animation
+        gsap.fromTo(
+          "#process-progress-line",
+          { scaleX: 0 },
+          {
+            scaleX: 1,
+            ease: "none",
+            scrollTrigger: {
+              trigger: "#process",
+              start: "top 75%",
+              end: "bottom 60%",
+              scrub: true,
+            },
+          }
+        );
+
+        // 2. Hero parallax / slight scale scale-out
+        gsap.to(".hero-light-ray", {
+          y: 80,
+          scale: 0.96,
+          ease: "none",
+          scrollTrigger: {
+            trigger: "#hero",
+            start: "top top",
+            end: "bottom top",
+            scrub: true,
+          },
+        });
+
+        gsap.to("#hero-canvas-wrap", {
+          y: 40,
+          scale: 0.98,
+          ease: "none",
+          scrollTrigger: {
+            trigger: "#hero",
+            start: "top top",
+            end: "bottom top",
+            scrub: true,
+          },
+        });
+      });
+    });
+
+    return () => {
+      if (ctx) ctx.revert();
+    };
+  }, [isLoading]);
+
   return (
     <>
       {/* Entry Loader Animation Gate as a fixed overlay */}

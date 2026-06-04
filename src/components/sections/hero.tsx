@@ -63,14 +63,14 @@ export default function Hero() {
     >
       {/* Premium Light Beam / Ray Ambient Glows */}
       <div 
-        className="absolute top-0 left-1/2 -translate-x-1/2 w-[120%] h-[120%] pointer-events-none select-none opacity-25 z-0"
+        className="hero-light-ray absolute top-0 left-1/2 -translate-x-1/2 w-[120%] h-[120%] pointer-events-none select-none opacity-25 z-0"
         style={{
           background: "radial-gradient(ellipse at top, rgba(43,160,220,0.18) 0%, rgba(14,95,181,0.05) 50%, transparent 80%)"
         }}
         aria-hidden="true"
       />
       <div
-        className="absolute top-0 left-1/2 -translate-x-1/2 w-[85vw] h-[100vh] pointer-events-none select-none opacity-[0.07] z-0"
+        className="hero-light-ray absolute top-0 left-1/2 -translate-x-1/2 w-[85vw] h-[100vh] pointer-events-none select-none opacity-[0.07] z-0"
         style={{
           background: "conic-gradient(from 180deg at 50% 0%, transparent 40%, var(--color-signature) 48%, var(--color-signature-bright) 50%, var(--color-signature) 52%, transparent 60%)",
           filter: "blur(70px)"
@@ -80,7 +80,9 @@ export default function Hero() {
 
       {/* 3D Canvas or Radial Gradient Fallback */}
       {showCanvas ? (
-        <HeroCanvas />
+        <div id="hero-canvas-wrap" className="absolute inset-0 w-full h-full z-0">
+          <HeroCanvas />
+        </div>
       ) : (
         <div 
           className="absolute inset-0 bg-[#000000] bg-[radial-gradient(circle_at_center,rgba(43,160,220,0.12),transparent_60%)] z-0" 
@@ -120,11 +122,11 @@ export default function Hero() {
             variants={itemVariants}
             className="text-4xl md:text-6xl lg:text-7xl font-extrabold tracking-tight text-white font-sora leading-[1.1] max-w-3xl"
           >
-            We build{" "}
+            {BRAND_CONFIG.primaryTagline.split("AI systems")[0]}
             <span className="text-transparent bg-clip-text bg-gradient-to-r from-white via-text-secondary to-signature">
               AI systems
-            </span>{" "}
-            that run your business.
+            </span>
+            {BRAND_CONFIG.primaryTagline.split("AI systems")[1]}
           </motion.h1>
 
           {/* Positioning Description */}

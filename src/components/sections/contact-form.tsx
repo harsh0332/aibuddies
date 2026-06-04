@@ -192,12 +192,14 @@ export default function ContactForm() {
                         value={form.name}
                         onChange={handleChange}
                         disabled={status === "loading"}
+                        aria-invalid={errors.name ? "true" : "false"}
+                        aria-describedby={errors.name ? `${nameId}-error` : undefined}
                         className={`w-full px-4 py-3 rounded-lg border bg-surface-base text-white text-sm focus:outline-none transition-colors ${
                           errors.name ? "border-red-500/80 focus:border-red-500" : "border-border-custom/50 focus:border-signature"
                         }`}
                       />
                       {errors.name && (
-                        <span className="text-[11px] text-red-400 font-medium" role="alert">{errors.name}</span>
+                        <span id={`${nameId}-error`} className="text-[11px] text-red-400 font-medium" role="alert">{errors.name}</span>
                       )}
                     </div>
 
@@ -212,12 +214,14 @@ export default function ContactForm() {
                         value={form.businessName}
                         onChange={handleChange}
                         disabled={status === "loading"}
+                        aria-invalid={errors.businessName ? "true" : "false"}
+                        aria-describedby={errors.businessName ? `${businessNameId}-error` : undefined}
                         className={`w-full px-4 py-3 rounded-lg border bg-surface-base text-white text-sm focus:outline-none transition-colors ${
                           errors.businessName ? "border-red-500/80 focus:border-red-500" : "border-border-custom/50 focus:border-signature"
                         }`}
                       />
                       {errors.businessName && (
-                        <span className="text-[11px] text-red-400 font-medium" role="alert">{errors.businessName}</span>
+                        <span id={`${businessNameId}-error`} className="text-[11px] text-red-400 font-medium" role="alert">{errors.businessName}</span>
                       )}
                     </div>
                   </div>
@@ -236,12 +240,14 @@ export default function ContactForm() {
                         value={form.whatsapp}
                         onChange={handleChange}
                         disabled={status === "loading"}
+                        aria-invalid={errors.whatsapp ? "true" : "false"}
+                        aria-describedby={errors.whatsapp ? `${whatsappId}-error` : undefined}
                         className={`w-full px-4 py-3 rounded-lg border bg-surface-base text-white text-sm focus:outline-none transition-colors ${
                           errors.whatsapp ? "border-red-500/80 focus:border-red-500" : "border-border-custom/50 focus:border-signature"
                         }`}
                       />
                       {errors.whatsapp && (
-                        <span className="text-[11px] text-red-400 font-medium" role="alert">{errors.whatsapp}</span>
+                        <span id={`${whatsappId}-error`} className="text-[11px] text-red-400 font-medium" role="alert">{errors.whatsapp}</span>
                       )}
                     </div>
 
@@ -257,12 +263,14 @@ export default function ContactForm() {
                         value={form.email}
                         onChange={handleChange}
                         disabled={status === "loading"}
+                        aria-invalid={errors.email ? "true" : "false"}
+                        aria-describedby={errors.email ? `${emailId}-error` : undefined}
                         className={`w-full px-4 py-3 rounded-lg border bg-surface-base text-white text-sm focus:outline-none transition-colors ${
                           errors.email ? "border-red-500/80 focus:border-red-500" : "border-border-custom/50 focus:border-signature"
                         }`}
                       />
                       {errors.email && (
-                        <span className="text-[11px] text-red-400 font-medium" role="alert">{errors.email}</span>
+                        <span id={`${emailId}-error`} className="text-[11px] text-red-400 font-medium" role="alert">{errors.email}</span>
                       )}
                     </div>
                   </div>
@@ -279,6 +287,8 @@ export default function ContactForm() {
                         value={form.service}
                         onChange={handleChange}
                         disabled={status === "loading"}
+                        aria-invalid={errors.service ? "true" : "false"}
+                        aria-describedby={errors.service ? `${serviceId}-error` : undefined}
                         className={`w-full px-4 py-3 rounded-lg border bg-surface-base text-white text-sm focus:outline-none transition-colors appearance-none ${
                           errors.service ? "border-red-500/80 focus:border-red-500" : "border-border-custom/50 focus:border-signature"
                         }`}
@@ -292,7 +302,7 @@ export default function ContactForm() {
                         <option value="Full Stack AI">Full Stack AI (Bundle)</option>
                       </select>
                       {errors.service && (
-                        <span className="text-[11px] text-red-400 font-medium" role="alert">{errors.service}</span>
+                        <span id={`${serviceId}-error`} className="text-[11px] text-red-400 font-medium" role="alert">{errors.service}</span>
                       )}
                     </div>
 

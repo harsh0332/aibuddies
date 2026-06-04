@@ -59,8 +59,14 @@ export default function Process() {
             
             {/* Background connection line for desktop */}
             <div 
-              className="hidden lg:block absolute top-[40px] left-[5%] right-[5%] h-[1px] bg-dashed bg-border-custom/30 -z-10" 
-              style={{ backgroundImage: "linear-gradient(to right, rgba(36,36,40,0.3) 50%, transparent 50%)", backgroundSize: "10px 1px" }}
+              className="hidden lg:block absolute top-[40px] left-[5%] right-[5%] h-[1px] bg-border-custom/30 -z-10" 
+              aria-hidden="true"
+            />
+            {/* Progress line driven by GSAP ScrollTrigger */}
+            <div 
+              id="process-progress-line"
+              className="hidden lg:block absolute top-[40px] left-[5%] h-[1px] bg-signature origin-left scale-x-0 -z-10" 
+              style={{ width: "90%" }}
               aria-hidden="true"
             />
 

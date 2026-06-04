@@ -4,7 +4,7 @@ import React, { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { BRAND_CONFIG } from "@/config/content";
 import CornerBorders from "../ui/corner-borders";
-import { Star, ChevronLeft, ChevronRight, Quote } from "lucide-react";
+import { ChevronLeft, ChevronRight, Quote } from "lucide-react";
 
 export default function Testimonials() {
   const [index, setIndex] = useState(0);
@@ -54,19 +54,12 @@ export default function Testimonials() {
 
           {/* Testimonial Slider Card */}
           <div className="relative">
-            <CornerBorders className="p-8 md:p-12 bg-surface-raised/40 backdrop-blur-sm glow-border min-h-[300px] flex flex-col justify-between relative overflow-hidden">
+            <CornerBorders className="p-8 md:p-12 bg-surface-raised/40 backdrop-blur-sm glow-border min-h-[260px] flex flex-col justify-between relative overflow-hidden">
               
               {/* Background Quote SVG */}
               <Quote className="absolute right-8 top-8 h-28 w-28 text-signature/5 pointer-events-none" />
 
-              <div className="relative z-10">
-                {/* Rating stars */}
-                <div className="flex gap-1 mb-6">
-                  {Array.from({ length: testimonials[index].rating }).map((_, i) => (
-                    <Star key={i} className="h-4 w-4 fill-signature text-signature" />
-                  ))}
-                </div>
-
+              <div className="relative z-10" aria-live="polite" id="testimonial-content-region">
                 {/* Testimonial Quote */}
                 <AnimatePresence mode="wait">
                   <motion.p
@@ -93,10 +86,10 @@ export default function Testimonials() {
                     transition={{ duration: 0.3 }}
                   >
                     <div className="text-base font-bold text-white font-sora">
-                      {testimonials[index].author}
+                      {testimonials[index].company}
                     </div>
                     <div className="text-xs text-text-tertiary">
-                      {testimonials[index].role}
+                      {testimonials[index].service}
                     </div>
                   </motion.div>
                 </AnimatePresence>
