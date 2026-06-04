@@ -7,7 +7,7 @@ import * as THREE from "three";
 // EXPOSED NAMED CONSTANTS
 export const PARTICLE_COUNT = 5000;
 export const SPHERE_RADIUS = 2;
-export const PARTICLE_COLOR = "#8b7fff";
+export const PARTICLE_COLOR = "#43C2D8";
 export const PARTICLE_SIZE = 0.025;
 export const REPEL_RADIUS = 1.2;
 export const REPEL_FORCE = 0.6;
@@ -170,13 +170,13 @@ function ParticleSphere() {
 
 export default function HeroCanvas() {
   return (
-    <div className="absolute inset-0 w-full h-full bg-[#05050a] z-0">
+    <div className="absolute inset-0 w-full h-full bg-[#000000] z-0">
       <Canvas
         camera={{ position: [0, 0, 5], fov: 60 }}
         gl={{ antialias: true, alpha: false }}
         style={{ pointerEvents: "auto" }}
       >
-        <color attach="background" args={["#05050a"]} />
+        <color attach="background" args={["#000000"]} />
         <ambientLight intensity={1.5} />
         <ParticleSphere />
       </Canvas>

@@ -1,17 +1,13 @@
 import type { Metadata } from "next";
-import { Sora, Geist } from "next/font/google";
+import { Plus_Jakarta_Sans } from "next/font/google";
 import CustomCursor from "@/components/ui/custom-cursor";
+import SmoothScrollProvider from "@/components/ui/smooth-scroll-provider";
 import "./globals.css";
 
-const sora = Sora({
-  variable: "--font-sora",
+const plusJakartaSans = Plus_Jakarta_Sans({
+  variable: "--font-jakarta",
   subsets: ["latin"],
   weight: ["300", "400", "500", "600", "700", "800"],
-});
-
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
 });
 
 export const metadata: Metadata = {
@@ -39,11 +35,13 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${sora.variable} ${geistSans.variable} h-full antialiased`}
+      className={`${plusJakartaSans.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col bg-surface-base text-white">
-        <CustomCursor />
-        {children}
+        <SmoothScrollProvider>
+          <CustomCursor />
+          {children}
+        </SmoothScrollProvider>
       </body>
     </html>
   );

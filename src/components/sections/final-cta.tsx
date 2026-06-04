@@ -4,6 +4,7 @@ import React from "react";
 import { motion } from "framer-motion";
 import { BRAND_CONFIG } from "@/config/content";
 import CornerBorders from "../ui/corner-borders";
+import { scrollToElement } from "@/components/ui/smooth-scroll-provider";
 
 export default function FinalCTA() {
   const containerVariants = {
@@ -16,10 +17,7 @@ export default function FinalCTA() {
 
   const handleCTAClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
     e.preventDefault();
-    const targetElement = document.querySelector("#contact");
-    if (targetElement) {
-      targetElement.scrollIntoView({ behavior: "smooth" });
-    }
+    scrollToElement("#contact");
   };
 
   return (
@@ -36,7 +34,7 @@ export default function FinalCTA() {
         >
           {/* Radial signature glow */}
           <div 
-            className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(139,127,255,0.08),transparent_60%)] -z-10 rounded-3xl" 
+            className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(43,160,220,0.08),transparent_60%)] -z-10 rounded-3xl" 
             aria-hidden="true" 
           />
 
@@ -62,7 +60,7 @@ export default function FinalCTA() {
                 <a
                   href="#contact"
                   onClick={handleCTAClick}
-                  className="inline-flex items-center justify-center px-8 py-4 rounded-full bg-signature text-black font-extrabold uppercase tracking-wider text-xs md:text-sm border border-signature/80 hover:bg-transparent hover:text-white transition-all duration-300 hover:shadow-[0_0_20px_rgba(139,127,255,0.5)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-signature"
+                  className="inline-flex items-center justify-center px-8 py-4 rounded-full bg-signature text-black font-extrabold uppercase tracking-wider text-xs md:text-sm border border-signature/80 hover:bg-transparent hover:text-white transition-all duration-300 hover:shadow-[0_0_20px_rgba(43,160,220,0.5)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-signature"
                 >
                   {BRAND_CONFIG.closingCTA.primaryBtn}
                 </a>

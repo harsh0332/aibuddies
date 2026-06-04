@@ -5,6 +5,7 @@ import { motion } from "framer-motion";
 import { BRAND_CONFIG } from "@/config/content";
 import CornerBorders from "../ui/corner-borders";
 import { Zap, Clock, ShieldCheck, TrendingUp, Cpu } from "lucide-react";
+import { scrollToElement } from "@/components/ui/smooth-scroll-provider";
 
 export default function WhyUs() {
   const containerVariants = {
@@ -83,7 +84,7 @@ export default function WhyUs() {
                 href="#contact"
                 onClick={(e) => {
                   e.preventDefault();
-                  document.querySelector("#contact")?.scrollIntoView({ behavior: "smooth" });
+                  scrollToElement("#contact");
                 }}
                 className="inline-flex items-center justify-center px-6 py-3 rounded-full bg-signature text-black font-semibold text-xs uppercase tracking-wider border border-signature/80 hover:bg-transparent hover:text-white transition-all duration-300"
               >

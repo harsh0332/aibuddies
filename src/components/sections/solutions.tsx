@@ -5,6 +5,7 @@ import { motion } from "framer-motion";
 import { BRAND_CONFIG } from "@/config/content";
 import CornerBorders from "../ui/corner-borders";
 import { Layers, CheckCircle2 } from "lucide-react";
+import { scrollToElement } from "@/components/ui/smooth-scroll-provider";
 
 export default function Solutions() {
   const containerVariants = {
@@ -99,9 +100,9 @@ export default function Solutions() {
                       href="#contact"
                       onClick={(e) => {
                         e.preventDefault();
-                        document.querySelector("#contact")?.scrollIntoView({ behavior: "smooth" });
+                        scrollToElement("#contact");
                       }}
-                      className="inline-flex items-center justify-center px-6 py-3 rounded-full bg-signature text-black font-semibold text-xs uppercase tracking-wider border border-signature/80 hover:bg-transparent hover:text-white transition-all duration-300 hover:shadow-[0_0_15px_rgba(139,127,255,0.4)]"
+                      className="inline-flex items-center justify-center px-6 py-3 rounded-full bg-signature text-black font-semibold text-xs uppercase tracking-wider border border-signature/80 hover:bg-transparent hover:text-white transition-all duration-300 hover:shadow-[0_0_15px_rgba(43,160,220,0.4)]"
                     >
                       Book Free Call
                     </a>
@@ -126,11 +127,11 @@ export default function Solutions() {
                     aria-hidden="true"
                   >
                     {/* Pulsing connections */}
-                    <line x1="150" y1="150" x2="60" y2="70" stroke="#8b7fff" strokeWidth="1.5" strokeDasharray="5 5" className="animate-pulse" />
-                    <line x1="150" y1="150" x2="240" y2="70" stroke="#8b7fff" strokeWidth="1.5" strokeDasharray="5 5" className="animate-pulse" />
-                    <line x1="150" y1="150" x2="240" y2="230" stroke="#8b7fff" strokeWidth="1.5" strokeDasharray="5 5" className="animate-pulse" />
-                    <line x1="150" y1="150" x2="60" y2="230" stroke="#8b7fff" strokeWidth="1.5" strokeDasharray="5 5" className="animate-pulse" />
-                    <line x1="150" y1="150" x2="150" y2="50" stroke="#8b7fff" strokeWidth="1.5" strokeDasharray="5 5" className="animate-pulse" />
+                    <line x1="150" y1="150" x2="60" y2="70" stroke="var(--color-signature)" strokeWidth="1.5" strokeDasharray="5 5" className="animate-pulse" />
+                    <line x1="150" y1="150" x2="240" y2="70" stroke="var(--color-signature)" strokeWidth="1.5" strokeDasharray="5 5" className="animate-pulse" />
+                    <line x1="150" y1="150" x2="240" y2="230" stroke="var(--color-signature)" strokeWidth="1.5" strokeDasharray="5 5" className="animate-pulse" />
+                    <line x1="150" y1="150" x2="60" y2="230" stroke="var(--color-signature)" strokeWidth="1.5" strokeDasharray="5 5" className="animate-pulse" />
+                    <line x1="150" y1="150" x2="150" y2="50" stroke="var(--color-signature)" strokeWidth="1.5" strokeDasharray="5 5" className="animate-pulse" />
 
                     {/* Nodes */}
                     {/* Node 1: Chatbots */}
@@ -140,7 +141,7 @@ export default function Solutions() {
                     {/* Node 2: WhatsApp */}
                     <circle cx="240" cy="70" r="14" fill="#0a0a0b" stroke="#242428" strokeWidth="1.5" />
                     <text x="240" y="73" fill="#9a9aa2" fontSize="9" textAnchor="middle" fontFamily="monospace">WA</text>
-
+ 
                     {/* Node 3: Voice */}
                     <circle cx="240" cy="230" r="14" fill="#0a0a0b" stroke="#242428" strokeWidth="1.5" />
                     <text x="240" y="233" fill="#9a9aa2" fontSize="9" textAnchor="middle" fontFamily="monospace">Voice</text>
@@ -154,9 +155,9 @@ export default function Solutions() {
                     <text x="150" y="53" fill="#9a9aa2" fontSize="9" textAnchor="middle" fontFamily="monospace">Help</text>
 
                     {/* Center Hub Node */}
-                    <circle cx="150" cy="150" r="28" fill="#8b7fff" className="animate-pulse" />
+                    <circle cx="150" cy="150" r="28" fill="var(--color-signature)" className="animate-pulse" />
                     <circle cx="150" cy="150" r="20" fill="#000000" />
-                    <text x="150" y="153" fill="#8b7fff" fontSize="10" fontWeight="bold" textAnchor="middle" fontFamily="sans-serif">FULL STACK</text>
+                    <text x="150" y="153" fill="var(--color-signature)" fontSize="10" fontWeight="bold" textAnchor="middle" fontFamily="sans-serif">FULL STACK</text>
                   </svg>
                 </div>
 

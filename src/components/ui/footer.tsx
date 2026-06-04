@@ -4,14 +4,12 @@ import React from "react";
 import Logo from "./logo";
 import { BRAND_CONFIG } from "@/config/content";
 import { Send } from "lucide-react";
+import { scrollToElement } from "./smooth-scroll-provider";
 
 export default function Footer() {
   const handleScrollToSection = (e: React.MouseEvent<HTMLAnchorElement>, href: string) => {
     e.preventDefault();
-    const targetElement = document.querySelector(href);
-    if (targetElement) {
-      targetElement.scrollIntoView({ behavior: "smooth" });
-    }
+    scrollToElement(href);
   };
 
   return (

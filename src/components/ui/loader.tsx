@@ -63,7 +63,7 @@ export default function Loader({ onComplete }: LoaderProps) {
         {/* Loading Progress Line */}
         <div className="relative w-full h-[1px] bg-border-custom/30 rounded-full mt-4">
           <motion.div
-            className="absolute left-0 top-0 h-full bg-signature shadow-[0_0_8px_#8b7fff]"
+            className="absolute left-0 top-0 h-full bg-signature shadow-[0_0_8px_#2BA0DC]"
             style={{ width: `${progress}%` }}
             transition={{ ease: "easeOut" }}
           />

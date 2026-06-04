@@ -4,12 +4,13 @@ import React, { useEffect, useState } from "react";
 import dynamic from "next/dynamic";
 import { motion } from "framer-motion";
 import { BRAND_CONFIG } from "@/config/content";
+import { scrollToElement } from "@/components/ui/smooth-scroll-provider";
 
 // Lazy-load the Three.js Canvas to optimize initial load and avoid SSR issues
 const HeroCanvas = dynamic(() => import("./hero-canvas"), {
   ssr: false,
   loading: () => (
-    <div className="absolute inset-0 bg-[#05050a] bg-[radial-gradient(circle_at_center,rgba(139,127,255,0.08),transparent_70%)]" />
+    <div className="absolute inset-0 bg-[#000000] bg-[radial-gradient(circle_at_center,rgba(43,160,220,0.08),transparent_70%)]" />
   ),
 });
 
@@ -52,23 +53,37 @@ export default function Hero() {
 
   const handleCTAClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
     e.preventDefault();
-    const targetElement = document.querySelector("#contact");
-    if (targetElement) {
-      targetElement.scrollIntoView({ behavior: "smooth" });
-    }
+    scrollToElement("#contact");
   };
 
   return (
     <section 
       id="hero" 
-      className="relative min-h-[92vh] w-full flex items-center justify-start overflow-hidden pt-24 md:pt-32 pb-20 px-6 md:px-12 lg:px-24 bg-[#05050a]"
+      className="relative min-h-[92vh] w-full flex items-center justify-start overflow-hidden pt-24 md:pt-32 pb-20 px-6 md:px-12 lg:px-24 bg-[#000000]"
     >
+      {/* Premium Light Beam / Ray Ambient Glows */}
+      <div 
+        className="absolute top-0 left-1/2 -translate-x-1/2 w-[120%] h-[120%] pointer-events-none select-none opacity-25 z-0"
+        style={{
+          background: "radial-gradient(ellipse at top, rgba(43,160,220,0.18) 0%, rgba(14,95,181,0.05) 50%, transparent 80%)"
+        }}
+        aria-hidden="true"
+      />
+      <div
+        className="absolute top-0 left-1/2 -translate-x-1/2 w-[85vw] h-[100vh] pointer-events-none select-none opacity-[0.07] z-0"
+        style={{
+          background: "conic-gradient(from 180deg at 50% 0%, transparent 40%, var(--color-signature) 48%, var(--color-signature-bright) 50%, var(--color-signature) 52%, transparent 60%)",
+          filter: "blur(70px)"
+        }}
+        aria-hidden="true"
+      />
+
       {/* 3D Canvas or Radial Gradient Fallback */}
       {showCanvas ? (
         <HeroCanvas />
       ) : (
         <div 
-          className="absolute inset-0 bg-[#05050a] bg-[radial-gradient(circle_at_center,rgba(139,127,255,0.12),transparent_60%)]" 
+          className="absolute inset-0 bg-[#000000] bg-[radial-gradient(circle_at_center,rgba(43,160,220,0.12),transparent_60%)] z-0" 
           aria-hidden="true"
         />
       )}
@@ -81,7 +96,7 @@ export default function Hero() {
 
       {/* Subtle glowing ambient background spheres */}
       <div 
-        className="absolute top-1/4 right-1/4 w-80 h-80 rounded-full bg-signature/10 blur-[130px] animate-glow-pulse pointer-events-none select-none"
+        className="absolute top-1/4 right-1/4 w-80 h-80 rounded-full bg-signature/10 blur-[130px] animate-glow-pulse pointer-events-none select-none z-0"
         aria-hidden="true"
       />
 
@@ -122,13 +137,13 @@ export default function Hero() {
 
           {/* Call to Action Buttons */}
           <motion.div 
-            variants={itemVariants}
+          variants={itemVariants}
             className="flex flex-wrap gap-4 mt-4"
           >
             <a
               href="#contact"
               onClick={handleCTAClick}
-              className="inline-flex items-center justify-center px-8 py-4 rounded-full bg-signature text-black font-bold uppercase tracking-wider text-xs md:text-sm border border-signature/80 hover:bg-transparent hover:text-white transition-all duration-300 hover:shadow-[0_0_20px_rgba(139,127,255,0.5)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-signature"
+              className="inline-flex items-center justify-center px-8 py-4 rounded-full bg-signature text-black font-bold uppercase tracking-wider text-xs md:text-sm border border-signature/80 hover:bg-transparent hover:text-white transition-all duration-300 hover:shadow-[0_0_20px_rgba(43,160,220,0.5)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-signature"
             >
               {BRAND_CONFIG.closingCTA.primaryBtn}
             </a>
@@ -137,7 +152,7 @@ export default function Hero() {
               href="#services"
               onClick={(e) => {
                 e.preventDefault();
-                document.querySelector("#services")?.scrollIntoView({ behavior: "smooth" });
+                scrollToElement("#services");
               }}
               className="inline-flex items-center justify-center px-8 py-4 rounded-full border border-border-custom/50 bg-surface-raised/40 backdrop-blur text-white font-bold uppercase tracking-wider text-xs md:text-sm hover:border-white transition-all duration-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-signature"
             >

@@ -108,7 +108,7 @@ export default function CustomCursor() {
         ref={ringRef}
         className={`pointer-events-none fixed left-0 top-0 z-[998] h-8 w-8 -translate-x-1/2 -translate-y-1/2 rounded-full border border-signature/60 transition-all duration-200 ease-out select-none ${
           isHovered
-            ? "scale-[1.8] border-signature bg-signature/10 shadow-[0_0_15px_rgba(139,127,255,0.4)]"
+            ? "scale-[1.8] border-signature bg-signature/10 shadow-[0_0_15px_rgba(43,160,220,0.4)]"
             : ""
         } ${isClicked ? "scale-[0.6] bg-signature/20" : ""}`}
       />

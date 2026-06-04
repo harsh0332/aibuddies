@@ -31,45 +31,67 @@ export default function Home() {
     }
   }, []);
 
+  // Control Lenis scrolling state based on loading state
+  useEffect(() => {
+    const toggleScroll = () => {
+      const lenis = (window as any).lenisInstance;
+      if (lenis) {
+        if (isLoading) {
+          lenis.stop();
+        } else {
+          lenis.start();
+        }
+      }
+    };
+    toggleScroll();
+    
+    // Poll to catch lazy Lenis initialization
+    const interval = setInterval(toggleScroll, 50);
+    const timeout = setTimeout(() => clearInterval(interval), 1500);
+
+    return () => {
+      clearInterval(interval);
+      clearTimeout(timeout);
+    };
+  }, [isLoading]);
+
   return (
     <>
-      {/* Entry Loader Animation Gate */}
+      {/* Entry Loader Animation Gate as a fixed overlay */}
       <AnimatePresence mode="wait">
         {isLoading && (
           <Loader onComplete={() => setIsLoading(false)} />
         )}
       </AnimatePresence>
 
-      {/* Main App Page Content */}
-      {!isLoading && (
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ duration: 0.8, ease: "easeOut" }}
-          className="relative flex flex-col min-h-screen"
-        >
-          {/* Header sticky navigation */}
-          <Navbar />
+      {/* Main App Page Content - always rendered in DOM for SEO & LCP */}
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={isLoading ? { opacity: 0 } : { opacity: 1 }}
+        transition={{ duration: 0.8, ease: "easeOut" }}
+        className="relative flex flex-col min-h-screen"
+      >
+        {/* Header sticky navigation */}
+        <Navbar />
 
-          {/* Staggered Sections stack */}
-          <main className="flex-1 w-full flex flex-col">
-            <Hero />
-            <About />
-            <Services />
-            <Solutions />
-            <Process />
-            <Portfolio />
-            <WhyUs />
-            <Testimonials />
-            <FAQ />
-            <ContactForm />
-            <FinalCTA />
-          </main>
+        {/* Staggered Sections stack */}
+        <main className="flex-1 w-full flex flex-col">
+          <Hero />
+          <About />
+          <Services />
+          <Solutions />
+          <Process />
+          <Portfolio />
+          <WhyUs />
+          <Testimonials />
+          <FAQ />
+          <ContactForm />
+          <FinalCTA />
+        </main>
 
-          {/* Footer branding */}
-          <Footer />
-        </motion.div>
-      )}
+        {/* Footer branding */}
+        <Footer />
+      </motion.div>
     </>
   );
 }

@@ -4,6 +4,7 @@ import React, { useState, useEffect } from "react";
 import Logo from "./logo";
 import { BRAND_CONFIG } from "@/config/content";
 import { Menu, X } from "lucide-react";
+import { scrollToElement } from "./smooth-scroll-provider";
 
 export default function Navbar() {
   const [isScrolled, setIsScrolled] = useState(false);
@@ -28,10 +29,7 @@ export default function Navbar() {
   const handleLinkClick = (e: React.MouseEvent<HTMLAnchorElement>, href: string) => {
     e.preventDefault();
     setMobileMenuOpen(false);
-    const targetElement = document.querySelector(href);
-    if (targetElement) {
-      targetElement.scrollIntoView({ behavior: "smooth" });
-    }
+    scrollToElement(href);
   };
 
   return (
@@ -73,7 +71,7 @@ export default function Navbar() {
           <a
             href="#contact"
             onClick={(e) => handleLinkClick(e, "#contact")}
-            className="inline-flex items-center justify-center px-5 py-2 text-xs font-semibold uppercase tracking-wider rounded-full bg-signature text-black border border-signature/80 hover:bg-transparent hover:text-white transition-all duration-300 hover:shadow-[0_0_15px_rgba(139,127,255,0.4)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-signature"
+            className="inline-flex items-center justify-center px-5 py-2 text-xs font-semibold uppercase tracking-wider rounded-full bg-signature text-black border border-signature/80 hover:bg-transparent hover:text-white transition-all duration-300 hover:shadow-[0_0_15px_rgba(43,160,220,0.4)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-signature"
           >
             {BRAND_CONFIG.closingCTA.primaryBtn}
           </a>
