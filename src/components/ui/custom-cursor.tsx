@@ -10,9 +10,13 @@ export default function CustomCursor() {
   const [isHovered, setIsHovered] = useState(false);
   const [isClicked, setIsClicked] = useState(false);
   
-  const mouseRef = useRef({ x: 0, y: 0 });
-  const ringPosRef = useRef({ x: 0, y: 0 });
+  const mouseRef = useRef({ x: -100, y: -100 });
+  const dotPosRef = useRef({ x: -100, y: -100 });
+  const ringPosRef = useRef({ x: -100, y: -100 });
   const animationFrameRef = useRef<number | null>(null);
+
+  // Ref tracker to throttle React state changes
+  const hoverStateRef = useRef(false);
 
   useEffect(() => {
     // Disable on touch devices and when prefers-reduced-motion is active
@@ -28,44 +32,67 @@ export default function CustomCursor() {
     const handleMouseMove = (e: MouseEvent) => {
       mouseRef.current.x = e.clientX;
       mouseRef.current.y = e.clientY;
-      
-      // Update dot position 1:1 instantly
-      if (dotRef.current) {
-        dotRef.current.style.transform = `translate3d(${e.clientX}px, ${e.clientY}px, 0)`;
-      }
     };
 
     const handleMouseDown = () => setIsClicked(true);
     const handleMouseUp = () => setIsClicked(false);
 
-    // Setup hover listeners for interactive elements
-    const addHoverListeners = () => {
-      const interactives = document.querySelectorAll('a, button, input, select, textarea, [role="button"], label');
-      interactives.forEach((el) => {
-        el.addEventListener("mouseenter", handleMouseEnter);
-        el.addEventListener("mouseleave", handleMouseLeave);
-      });
+    // Event Delegation: single listener on document instead of MutationObserver
+    const handleMouseOver = (e: MouseEvent) => {
+      const target = e.target as HTMLElement;
+      if (target && target.closest) {
+        const isOverInteractive = !!target.closest(
+          'a, button, input, select, textarea, [role="button"], label'
+        );
+        if (isOverInteractive !== hoverStateRef.current) {
+          hoverStateRef.current = isOverInteractive;
+          setIsHovered(isOverInteractive);
+        }
+      }
     };
 
-    const handleMouseEnter = () => setIsHovered(true);
-    const handleMouseLeave = () => setIsHovered(false);
+    const handleMouseOut = (e: MouseEvent) => {
+      const target = e.relatedTarget as HTMLElement;
+      if (!target || !target.closest) {
+        // If cursor moves out of the viewport
+        if (hoverStateRef.current) {
+          hoverStateRef.current = false;
+          setIsHovered(false);
+        }
+        return;
+      }
+      const isOverInteractive = !!target.closest(
+        'a, button, input, select, textarea, [role="button"], label'
+      );
+      if (isOverInteractive !== hoverStateRef.current) {
+        hoverStateRef.current = isOverInteractive;
+        setIsHovered(isOverInteractive);
+      }
+    };
 
-    window.addEventListener("mousemove", handleMouseMove);
-    window.addEventListener("mousedown", handleMouseDown);
-    window.addEventListener("mouseup", handleMouseUp);
+    window.addEventListener("mousemove", handleMouseMove, { passive: true });
+    window.addEventListener("mousedown", handleMouseDown, { passive: true });
+    window.addEventListener("mouseup", handleMouseUp, { passive: true });
     
-    // We observe mutations in the DOM to attach listeners to dynamically mounted components
-    const observer = new MutationObserver(addHoverListeners);
-    observer.observe(document.body, { childList: true, subtree: true });
-    
-    addHoverListeners();
+    // Bind delegation listeners
+    document.addEventListener("mouseover", handleMouseOver, { passive: true });
+    document.addEventListener("mouseout", handleMouseOut, { passive: true });
 
-    // Smooth Lerp loop for the outer ring
+    // Single requestAnimationFrame loop driving BOTH dot and ring positioning
     const render = () => {
-      const lerp = 0.15;
-      
-      ringPosRef.current.x += (mouseRef.current.x - ringPosRef.current.x) * lerp;
-      ringPosRef.current.y += (mouseRef.current.y - ringPosRef.current.y) * lerp;
+      // 1. Dot positioning with quick smoothing (lerp = 0.35)
+      const dotLerp = 0.35;
+      dotPosRef.current.x += (mouseRef.current.x - dotPosRef.current.x) * dotLerp;
+      dotPosRef.current.y += (mouseRef.current.y - dotPosRef.current.y) * dotLerp;
+
+      if (dotRef.current) {
+        dotRef.current.style.transform = `translate3d(${dotPosRef.current.x}px, ${dotPosRef.current.y}px, 0)`;
+      }
+
+      // 2. Ring positioning with smooth trailing (lerp = 0.20)
+      const ringLerp = 0.20;
+      ringPosRef.current.x += (mouseRef.current.x - ringPosRef.current.x) * ringLerp;
+      ringPosRef.current.y += (mouseRef.current.y - ringPosRef.current.y) * ringLerp;
 
       if (ringRef.current) {
         ringRef.current.style.transform = `translate3d(${ringPosRef.current.x}px, ${ringPosRef.current.y}px, 0)`;
@@ -80,17 +107,12 @@ export default function CustomCursor() {
       window.removeEventListener("mousemove", handleMouseMove);
       window.removeEventListener("mousedown", handleMouseDown);
       window.removeEventListener("mouseup", handleMouseUp);
+      document.removeEventListener("mouseover", handleMouseOver);
+      document.removeEventListener("mouseout", handleMouseOut);
       
       if (animationFrameRef.current) {
         cancelAnimationFrame(animationFrameRef.current);
       }
-      
-      observer.disconnect();
-      const interactives = document.querySelectorAll('a, button, input, select, textarea, [role="button"], label');
-      interactives.forEach((el) => {
-        el.removeEventListener("mouseenter", handleMouseEnter);
-        el.removeEventListener("mouseleave", handleMouseLeave);
-      });
     };
   }, []);
 
@@ -98,20 +120,31 @@ export default function CustomCursor() {
 
   return (
     <>
-      {/* Inner Dot: follows cursor 1:1 */}
+      {/* Inner Dot Wrapper: Pure translate3d, no transition */}
       <div
         ref={dotRef}
-        className="pointer-events-none fixed left-0 top-0 z-[999] h-2 w-2 -translate-x-1/2 -translate-y-1/2 rounded-full bg-white transition-opacity duration-300 select-none mix-blend-difference"
-      />
-      {/* Outer Ring: trails cursor via lerp */}
+        className="pointer-events-none fixed left-0 top-0 z-[999] -translate-x-1/2 -translate-y-1/2 select-none mix-blend-difference"
+        style={{ willChange: "transform" }}
+      >
+        {/* Visual Dot */}
+        <div className="h-2 w-2 rounded-full bg-white" />
+      </div>
+
+      {/* Outer Ring Wrapper: Pure translate3d, no transition */}
       <div
         ref={ringRef}
-        className={`pointer-events-none fixed left-0 top-0 z-[998] h-8 w-8 -translate-x-1/2 -translate-y-1/2 rounded-full border border-signature/60 transition-all duration-200 ease-out select-none ${
-          isHovered
-            ? "scale-[1.8] border-signature bg-signature/10 shadow-[0_0_15px_rgba(43,160,220,0.4)]"
-            : ""
-        } ${isClicked ? "scale-[0.6] bg-signature/20" : ""}`}
-      />
+        className="pointer-events-none fixed left-0 top-0 z-[998] -translate-x-1/2 -translate-y-1/2 select-none"
+        style={{ willChange: "transform" }}
+      >
+        {/* Visual Ring: Styled and scaled via CSS transitions */}
+        <div
+          className={`h-8 w-8 rounded-full border border-signature/60 transition-[transform,background-color,border-color,box-shadow] duration-150 ease-out ${
+            isHovered
+              ? "scale-[1.8] border-signature bg-signature/10 shadow-[0_0_15px_rgba(43,160,220,0.4)]"
+              : ""
+          } ${isClicked ? "scale-[0.6] bg-signature/20" : ""}`}
+        />
+      </div>
     </>
   );
 }
