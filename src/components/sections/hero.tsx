@@ -62,13 +62,15 @@ export default function Hero({ is3DActive = false }: HeroProps) {
         aria-hidden="true"
       />
 
-      {/* 3D Canvas Fallback background */}
-      {!is3DActive && (
-        <div 
-          className="absolute inset-0 bg-[#000000] bg-[radial-gradient(circle_at_center,rgba(43,160,220,0.12),transparent_60%)] z-0" 
-          aria-hidden="true"
-        />
-      )}
+      {/* 3D Canvas Background Overlay (Solid black fallback for mobile, transparent glow for 3D) */}
+      <div 
+        className={`absolute inset-0 z-0 ${
+          is3DActive 
+            ? "bg-[radial-gradient(circle_at_center,rgba(43,160,220,0.12),transparent_60%)]" 
+            : "bg-[#000000] bg-[radial-gradient(circle_at_center,rgba(43,160,220,0.12),transparent_60%)]"
+        }`} 
+        aria-hidden="true"
+      />
 
       {/* Grid Pattern overlay for tech feel */}
       <div 

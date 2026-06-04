@@ -213,7 +213,7 @@ export default function Home() {
         initial={{ opacity: 0 }}
         animate={isLoading ? { opacity: 0 } : { opacity: 1 }}
         transition={{ duration: 0.8, ease: "easeOut" }}
-        className="relative flex flex-col min-h-screen"
+        className="relative z-10 flex flex-col min-h-screen"
       >
         {/* Header sticky navigation */}
         <Navbar />

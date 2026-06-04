@@ -343,7 +343,7 @@ export default function ParticleField({ stage }: ParticleFieldProps) {
   if (isHidden) return null;
 
   return (
-    <div className="fixed inset-0 w-full h-full pointer-events-none -z-10 select-none bg-transparent">
+    <div className="fixed inset-0 w-full h-full pointer-events-none z-0 select-none bg-transparent">
       <Canvas
         camera={{ position: [0, 0, 5], fov: 60 }}
         gl={{ antialias: true, alpha: true }}
