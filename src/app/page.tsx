@@ -215,17 +215,24 @@ export default function Home() {
           },
         });
 
-        // If 3D is active, expose scrollToService on window to allow external components to scroll to a specific service card.
+        // If 3D is active, setup scroll-triggered services pinning and scrollToService exposure.
         if (is3DActive) {
+          const servicesTrigger = ScrollTrigger.create({
+            trigger: "#services-container",
+            start: "top top",
+            end: "bottom bottom",
+            pin: "#services", // Explicit pinning to avoid CSS flex sticky failures
+            pinSpacing: false,
+            scrub: true,
+          });
+
           (window as any).scrollToService = (index: number) => {
-            const el = document.getElementById("services");
-            const lenis = (window as any).lenisInstance;
-            if (el && lenis) {
-              const rect = el.getBoundingClientRect();
-              const start = window.scrollY + rect.top;
-              const scrollable = rect.height - window.innerHeight;
-              const targetScroll = start + (index / 4) * scrollable;
-              lenis.scrollTo(targetScroll, {
+            const currentLenis = (window as any).lenisInstance;
+            if (currentLenis && servicesTrigger) {
+              const start = servicesTrigger.start;
+              const end = servicesTrigger.end;
+              const targetScroll = start + (index / 4.0) * (end - start);
+              currentLenis.scrollTo(targetScroll, {
                 duration: 1.2,
                 ease: (t: number) => 1 - Math.pow(1 - t, 3)
               });

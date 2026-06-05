@@ -262,7 +262,6 @@ export default function ParticleField({ is3DActive = false }: ParticleFieldProps
       transparent: true,
       opacity: 0.95,
       depthWrite: false,
-      depthTest: false,
       blending: THREE.AdditiveBlending,
       sizeAttenuation: true,
     });
@@ -330,7 +329,7 @@ export default function ParticleField({ is3DActive = false }: ParticleFieldProps
 
       /* ---- scroll-driven state (read each frame, no scroll-jank) ---- */
       const heroEl = document.getElementById("hero");
-      const wrapEl = document.getElementById("services");
+      const wrapEl = document.getElementById("services-container");
 
       const heroRect = heroEl ? heroEl.getBoundingClientRect() : null;
       const heroProg = heroRect ? clamp(-heroRect.top / heroRect.height, 0, 1) : 0;

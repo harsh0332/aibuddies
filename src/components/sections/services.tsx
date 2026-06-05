@@ -78,6 +78,7 @@ export default function Services({
   onCardClick
 }: ServicesProps) {
   const servicesRef = useRef<HTMLDivElement>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
   const trackRef = useRef<HTMLDivElement>(null);
   const cardRefs = useRef<(HTMLDivElement | null)[]>([]);
   const counterRef = useRef<HTMLDivElement>(null);
@@ -105,10 +106,10 @@ export default function Services({
       if (disposed) return;
       rafId = requestAnimationFrame(loop);
 
-      const servicesEl = servicesRef.current;
-      if (!servicesEl) return;
+      const containerEl = containerRef.current;
+      if (!containerEl) return;
 
-      const sr = servicesEl.getBoundingClientRect();
+      const sr = containerEl.getBoundingClientRect();
       const vh = window.innerHeight;
       const scrollable = sr.height - vh;
       const sp = Math.min(1, Math.max(0, -sr.top / (scrollable || 1)));
@@ -267,9 +268,9 @@ export default function Services({
   }
 
   return (
-    <section
-      ref={servicesRef}
-      id="services"
+    <div
+      ref={containerRef}
+      id="services-container"
       className="relative w-full bg-transparent"
       style={{ height: "500vh" }}
     >
@@ -285,8 +286,10 @@ export default function Services({
         .glass { backdrop-filter: blur(24px); -webkit-backdrop-filter: blur(24px); }
       `}} />
 
-      <div
-        className="sticky top-0 h-screen w-full overflow-hidden flex items-center justify-center"
+      <section
+        ref={servicesRef}
+        id="services"
+        className="relative h-screen w-full overflow-hidden bg-transparent flex items-center justify-center"
       >
         <div className="flex h-full w-full">
           {/* Left Column */}
@@ -419,7 +422,7 @@ export default function Services({
             </div>
           </div>
         </div>
-      </div>
-    </section>
+      </section>
+    </div>
   );
 }
