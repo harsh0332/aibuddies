@@ -17,6 +17,7 @@ import Solutions from "@/components/sections/solutions";
 import Process from "@/components/sections/process";
 import Portfolio from "@/components/sections/portfolio";
 import TrustBar from "@/components/sections/trust-bar";
+import WhyUs from "@/components/sections/why-us";
 import ProblemAgitation from "@/components/sections/problem";
 import InlineCTA from "@/components/sections/inline-cta";
 import Testimonials from "@/components/sections/testimonials";
@@ -321,6 +322,7 @@ export default function Home() {
             <Solutions />
             <Process />
             <Portfolio />
+            <WhyUs />
             <InlineCTA heading="See how much time and revenue you can save with custom AI systems." />
             <FAQ />
             <Testimonials />

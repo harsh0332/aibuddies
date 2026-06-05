@@ -19,12 +19,13 @@ export default function WhyUs() {
   };
 
   const revealVariants = {
-    hidden: { opacity: 0, y: 30 },
+    hidden: { opacity: 0, y: 20, filter: "blur(4px)" },
     visible: {
       opacity: 1,
       y: 0,
+      filter: "blur(0px)",
       transition: {
-        duration: 0.8,
+        duration: 0.45,
         ease: [0.16, 1, 0.3, 1] as const,
       },
     },
@@ -104,7 +105,7 @@ export default function WhyUs() {
                 variants={revealVariants}
                 className={`group ${index === 4 ? "md:col-span-2" : ""}`}
               >
-                <CornerBorders className="h-full p-8 bg-surface-raised/40 backdrop-blur-sm transition-all duration-300 hover:-translate-y-1.5 glow-border">
+                <CornerBorders className="h-full p-8 glass-card-premium hover:-translate-y-1.5">
                   <div className="flex flex-col gap-4">
                     {/* Header: Icon */}
                     <div className="p-2.5 bg-signature/5 w-fit rounded-lg border border-signature/10 group-hover:bg-signature/10 group-hover:border-signature/30 transition-all duration-300">
