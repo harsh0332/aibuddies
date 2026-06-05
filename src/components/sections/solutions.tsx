@@ -103,7 +103,7 @@ export default function Solutions() {
                         e.preventDefault();
                         scrollToElement("#contact");
                       }}
-                      className="inline-flex items-center justify-center px-6 py-3 rounded-full bg-signature text-black font-semibold text-xs uppercase tracking-wider border border-signature/80 hover:bg-transparent hover:text-white transition-all duration-300 hover:shadow-[0_0_15px_rgba(43,160,220,0.4)]"
+                      className="inline-flex items-center justify-center px-6 py-3.5 rounded-full bg-signature text-black font-semibold text-xs uppercase tracking-wider border border-signature/80 hover:bg-transparent hover:text-white transition-all duration-300 hover:shadow-[0_0_15px_rgba(43,160,220,0.4)]"
                     >
                       Book Free Call
                     </a>

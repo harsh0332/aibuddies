@@ -181,12 +181,17 @@ export default function ContactForm() {
             </p>
 
             <div className="flex flex-col gap-4 mt-4">
-              <div className="flex items-center gap-3">
-                <div className="p-2 rounded bg-whatsapp/10 border border-whatsapp/20 text-whatsapp select-none">
+              <a 
+                href={BRAND_CONFIG.contact.whatsappLink} 
+                target="_blank" 
+                rel="noopener noreferrer"
+                className="flex items-center gap-3 p-3.5 rounded-xl bg-whatsapp/5 border border-whatsapp/10 hover:bg-whatsapp/10 hover:border-whatsapp/25 transition-all duration-300 group select-none min-h-[48px]"
+              >
+                <div className="p-2 rounded bg-whatsapp/10 border border-whatsapp/20 text-whatsapp transition-colors group-hover:bg-whatsapp/20">
                   <MessageCircle size={18} />
                 </div>
-                <div>
-                  <div className="text-xs text-text-tertiary flex items-center gap-1.5">
+                <div className="flex-1">
+                  <div className="text-[10px] text-text-tertiary flex items-center gap-1.5">
                     <span>WhatsApp Chat</span>
                     <span className="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded-full bg-whatsapp/10 border border-whatsapp/30 text-[9px] text-whatsapp font-bold font-sans">
                       <svg className="w-2.5 h-2.5 fill-current text-whatsapp" viewBox="0 0 20 20">
@@ -195,16 +200,11 @@ export default function ContactForm() {
                       {(BRAND_CONFIG as any).trustSignals?.verifiedBadgeText}
                     </span>
                   </div>
-                  <a 
-                    href={BRAND_CONFIG.contact.whatsappLink} 
-                    target="_blank" 
-                    rel="noopener noreferrer"
-                    className="text-sm font-semibold text-white hover:text-whatsapp transition-colors mt-0.5 block"
-                  >
+                  <div className="text-sm font-semibold text-white group-hover:text-whatsapp transition-colors mt-0.5">
                     {(BRAND_CONFIG as any).trustSignals?.whatsappClickToChat} ({BRAND_CONFIG.contact.whatsapp})
-                  </a>
+                  </div>
                 </div>
-              </div>
+              </a>
             </div>
           </div>
 
@@ -281,7 +281,7 @@ export default function ContactForm() {
                           }
                         }}
                         disabled={s > step && (!form.industry || (s === 3 && !form.goal))}
-                        className={`relative z-10 w-7 h-7 rounded-full flex items-center justify-center text-xs font-mono font-bold transition-all duration-300 border ${
+                        className={`relative z-10 w-8 h-8 rounded-full flex items-center justify-center text-xs font-mono font-bold transition-all duration-300 border before:absolute before:top-1/2 before:left-1/2 before:-translate-x-1/2 before:-translate-y-1/2 before:w-11 before:h-11 ${
                           s < step 
                             ? "bg-signature text-black border-signature" 
                             : s === step
@@ -376,7 +376,7 @@ export default function ContactForm() {
                             <button
                               type="button"
                               onClick={handlePrevStep}
-                              className="inline-flex items-center gap-1 text-xs text-text-tertiary hover:text-white transition-colors"
+                              className="inline-flex items-center gap-1 text-xs text-text-tertiary hover:text-white transition-colors py-2.5 px-3 -ml-3 rounded-lg"
                             >
                               <ChevronLeft size={14} /> Back to step 1
                             </button>
@@ -479,7 +479,7 @@ export default function ContactForm() {
                               <button
                                 type="button"
                                 onClick={handlePrevStep}
-                                className="self-start inline-flex items-center gap-1 text-xs text-text-tertiary hover:text-white transition-colors mt-1"
+                                className="self-start inline-flex items-center gap-1 text-xs text-text-tertiary hover:text-white transition-colors py-2.5 px-3 -ml-3 rounded-lg mt-1"
                               >
                                 <ChevronLeft size={14} /> Back to step 2
                               </button>

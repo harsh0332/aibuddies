@@ -188,16 +188,18 @@ const smoothstep = (e0: number, e1: number, x: number) => {
   return t * t * (3 - 2 * t); 
 };
 
-export default function ParticleField() {
-  const canvasRef = useRef<HTMLCanvasElement>(null);
-  const [isStatic, setIsStatic] = useState(false);
+interface ParticleFieldProps {
+  is3DActive?: boolean;
+}
 
-  // detect mobile / reduced-motion once
+export default function ParticleField({ is3DActive = false }: ParticleFieldProps) {
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+  const [isStatic, setIsStatic] = useState(true);
+
+  // Sync isStatic with is3DActive from parent
   useEffect(() => {
-    const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    const coarse  = window.matchMedia('(pointer: coarse)').matches;
-    setIsStatic(reduced || coarse);
-  }, []);
+    setIsStatic(!is3DActive);
+  }, [is3DActive]);
 
   useEffect(() => {
     if (isStatic) return;

@@ -43,15 +43,35 @@ export default function Home() {
     }
   }, []);
 
-  // Detect 3D compatibility on client side (desktop non-touch with preferred motion)
+  // Detect 3D compatibility on client side (desktop non-touch with preferred motion and min-width 1024px)
   useEffect(() => {
-    if (typeof window !== "undefined") {
-      const isTouch = window.matchMedia("(pointer: coarse)").matches;
+    if (typeof window === "undefined") return;
+
+    const check3DCompatibility = () => {
+      const isLargeScreen = window.innerWidth >= 1024;
+      const isFinePointer = window.matchMedia("(pointer: fine)").matches;
       const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-      if (!isTouch && !prefersReducedMotion) {
-        setIs3DActive(true);
-      }
-    }
+      
+      const compatible = isLargeScreen && isFinePointer && !prefersReducedMotion;
+      setIs3DActive(compatible);
+    };
+
+    check3DCompatibility();
+
+    let resizeTimer: NodeJS.Timeout;
+    const handleResize = () => {
+      clearTimeout(resizeTimer);
+      resizeTimer = setTimeout(check3DCompatibility, 150);
+    };
+
+    window.addEventListener("resize", handleResize);
+    window.addEventListener("orientationchange", check3DCompatibility);
+    
+    return () => {
+      window.removeEventListener("resize", handleResize);
+      window.removeEventListener("orientationchange", check3DCompatibility);
+      clearTimeout(resizeTimer);
+    };
   }, []);
 
   // Control Lenis scrolling state based on loading state
@@ -286,7 +306,7 @@ export default function Home() {
       </AnimatePresence>
 
       {/* Global background particle canvas */}
-      {!isLoading && <ParticleField />}
+      {!isLoading && <ParticleField is3DActive={is3DActive} />}
 
       {/* Main App Page Content - always rendered in DOM for SEO & LCP */}
       <motion.div

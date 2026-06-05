@@ -58,7 +58,7 @@ export default function InlineCTA({ heading }: InlineCTAProps) {
                     <a
                       href="#contact"
                       onClick={handlePrimaryClick}
-                      className="inline-flex items-center justify-center px-6 py-3 rounded-full bg-signature text-black font-extrabold uppercase tracking-wider text-xs border border-signature/80 hover:bg-transparent hover:text-white transition-all duration-300 hover:shadow-[0_0_15px_rgba(43,160,220,0.4)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-signature"
+                      className="inline-flex items-center justify-center px-6 py-3.5 rounded-full bg-signature text-black font-extrabold uppercase tracking-wider text-xs border border-signature/80 hover:bg-transparent hover:text-white transition-all duration-300 hover:shadow-[0_0_15px_rgba(43,160,220,0.4)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-signature"
                     >
                       {BRAND_CONFIG.closingCTA.primaryBtn}
                     </a>
@@ -67,7 +67,7 @@ export default function InlineCTA({ heading }: InlineCTAProps) {
                   <a
                     href="#process"
                     onClick={handleSecondaryClick}
-                    className="inline-flex items-center justify-center px-6 py-3 rounded-full border border-border-custom/50 bg-surface-raised/40 backdrop-blur text-white font-extrabold uppercase tracking-wider text-xs hover:border-white transition-all duration-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-signature"
+                    className="inline-flex items-center justify-center px-6 py-3.5 rounded-full border border-border-custom/50 bg-surface-raised/40 backdrop-blur text-white font-extrabold uppercase tracking-wider text-xs hover:border-white transition-all duration-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-signature"
                   >
                     {(BRAND_CONFIG as any).ctaSystem?.secondaryBtnText || "See how it works"}
                   </a>
