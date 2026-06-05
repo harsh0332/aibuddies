@@ -6,7 +6,7 @@ import * as THREE from "three";
 /* ---- TWEAK KNOBS ---------------------------------------------------------- */
 const PARTICLE_COUNT = 4000;
 const SPHERE_RADIUS = 1.4;
-const PARTICLE_SIZE = 0.045;
+const PARTICLE_SIZE = 0.035;
 const REPEL_RADIUS = 0.9;
 const REPEL_FORCE = 0.55;
 const RETURN_LERP = 0.10;
@@ -18,6 +18,7 @@ const LEFT_FRACTION = 0.26;
 const COL = {
   primary: "#2BA0DC", // brand — borders, active-card fill, interactive
   accent: "#43C2D8", // glow, ring highlights, particle color
+  deep: "#0E5FB5", // deep blue for rich gradient saturation
   text: "#f6f6fd",
 };
 
@@ -188,7 +189,7 @@ function hexRgb(h: string): [number, number, number] {
 }
 
 const C_PART = hexRgb(COL.accent);
-const C_ACC = hexRgb(COL.primary);
+const C_ACC = hexRgb(COL.deep);
 
 /* round soft particle sprite */
 function makeSprite(): THREE.CanvasTexture {
