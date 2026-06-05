@@ -215,67 +215,22 @@ export default function Home() {
           },
         });
 
-        // If 3D is active, setup scroll-triggered particle morphing triggers
+        // If 3D is active, expose scrollToService on window to allow external components to scroll to a specific service card.
         if (is3DActive) {
-          // Trigger 1: Stage 0 -> 1: From Services entering bottom of screen to reaching top of screen
-          ScrollTrigger.create({
-            trigger: "#services-container",
-            start: "top bottom",
-            end: "top top",
-            scrub: true,
-            onUpdate: (self) => {
-              if (self.progress < 1) {
-                (window as any).targetStage = self.progress;
-              }
-            },
-          });
-
-          // Trigger 2: Stage 1 -> 5: Services section (GSAP Pinning + Staged Morphing)
-          const servicesTrigger = ScrollTrigger.create({
-            trigger: "#services-container",
-            start: "top top",
-            end: "bottom bottom",
-            pin: "#services", // Explicit pinning to avoid CSS flex sticky failures
-            pinSpacing: false,
-            scrub: true,
-            onUpdate: (self) => {
-              const p = self.progress;
-              const index = Math.min(Math.floor(p * 5), 4);
-              setActiveIndex((prev) => {
-                if (prev !== index) {
-                  (window as any).targetStage = 1.0 + index;
-                  return index;
-                }
-                return prev;
-              });
-            },
-          });
-
-          // Expose scrollToService on window to allow card clicks to scroll smoothly
           (window as any).scrollToService = (index: number) => {
-            const currentLenis = (window as any).lenisInstance;
-            if (currentLenis && servicesTrigger) {
-              const start = servicesTrigger.start;
-              const end = servicesTrigger.end;
-              // Target scroll is distributed evenly across sticky region
-              const targetScroll = start + (index / 4.0) * (end - start);
-              currentLenis.scrollTo(targetScroll, { 
-                duration: 1.2, 
-                ease: (t: number) => 1 - Math.pow(1 - t, 3) 
+            const el = document.getElementById("services");
+            const lenis = (window as any).lenisInstance;
+            if (el && lenis) {
+              const rect = el.getBoundingClientRect();
+              const start = window.scrollY + rect.top;
+              const scrollable = rect.height - window.innerHeight;
+              const targetScroll = start + (index / 4) * scrollable;
+              lenis.scrollTo(targetScroll, {
+                duration: 1.2,
+                ease: (t: number) => 1 - Math.pow(1 - t, 3)
               });
             }
           };
-
-          // Trigger 3: Stage 5 -> 5.5: TrustBar section fade out
-          ScrollTrigger.create({
-            trigger: "#trust-bar",
-            start: "top bottom",
-            end: "top 50%",
-            scrub: true,
-            onUpdate: (self) => {
-              (window as any).targetStage = 5.0 + self.progress * 0.5;
-            },
-          });
         }
       });
     });
