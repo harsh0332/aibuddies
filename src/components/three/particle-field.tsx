@@ -6,7 +6,7 @@ import * as THREE from "three";
 /* ---- TWEAK KNOBS ---------------------------------------------------------- */
 const PARTICLE_COUNT = 4000;
 const SPHERE_RADIUS = 1.4;
-const PARTICLE_SIZE = 0.035;
+const PARTICLE_SIZE = 0.045;
 const REPEL_RADIUS = 0.9;
 const REPEL_FORCE = 0.55;
 const RETURN_LERP = 0.10;
@@ -18,7 +18,6 @@ const LEFT_FRACTION = 0.26;
 const COL = {
   primary: "#2BA0DC", // brand — borders, active-card fill, interactive
   accent: "#43C2D8", // glow, ring highlights, particle color
-  deep: "#0E5FB5", // deep blue for rich gradient saturation
   text: "#f6f6fd",
 };
 
@@ -189,7 +188,7 @@ function hexRgb(h: string): [number, number, number] {
 }
 
 const C_PART = hexRgb(COL.accent);
-const C_ACC = hexRgb(COL.deep);
+const C_ACC = hexRgb(COL.primary);
 
 /* round soft particle sprite */
 function makeSprite(): THREE.CanvasTexture {
@@ -225,7 +224,14 @@ export default function ParticleField({ is3DActive = false }: ParticleFieldProps
     const canvas = canvasRef.current;
     if (!canvas) return;
 
-    const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true, preserveDrawingBuffer: true });
+    let renderer: THREE.WebGLRenderer;
+    try {
+      renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true, preserveDrawingBuffer: true });
+    } catch (e) {
+      console.warn("WebGL initialization failed, falling back to static background:", e);
+      setIsStatic(true);
+      return;
+    }
     renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
 
     const scene = new THREE.Scene();
@@ -330,7 +336,7 @@ export default function ParticleField({ is3DActive = false }: ParticleFieldProps
 
       /* ---- scroll-driven state (read each frame, no scroll-jank) ---- */
       const heroEl = document.getElementById("hero");
-      const wrapEl = document.getElementById("services-container");
+      const wrapEl = document.getElementById("services");
 
       const heroRect = heroEl ? heroEl.getBoundingClientRect() : null;
       const heroProg = heroRect ? clamp(-heroRect.top / heroRect.height, 0, 1) : 0;
@@ -348,6 +354,20 @@ export default function ParticleField({ is3DActive = false }: ParticleFieldProps
 
       const A = shapes[i0 + 1]; // active shape (index 1 to 5)
       const B = shapes[i1 + 1];
+
+      if (!A || !B) {
+        console.error("SHAPES ERROR:", {
+          i0,
+          i1,
+          activeFloat,
+          svcProg,
+          shapesLength: shapes.length,
+          hasA: !!A,
+          hasB: !!B
+        });
+        raf = requestAnimationFrame(frame);
+        return;
+      }
 
       const damp = enter < 0.02 ? RETURN_LERP : MORPH_LERP;
       const pos = geo.attributes.position.array as Float32Array;

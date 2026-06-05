@@ -63,14 +63,12 @@
 html {
   background-color: #000000;
   color: #ffffff;
-  overflow-x: hidden;
 }
 
 body {
   background-color: #000000;
   color: #ffffff;
   font-family: var(--font-jakarta), sans-serif;
-  overflow-x: hidden;
   position: relative;
   min-height: 100vh;
 }
