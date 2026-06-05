@@ -282,8 +282,8 @@ export default function Home() {
         )}
       </AnimatePresence>
 
-      {/* Global background 3D particle canvas (bypasses props, reads scroll stage from window inside R3F) */}
-      {is3DActive && !isLoading && <ParticleField />}
+      {/* Global background particle canvas */}
+      {!isLoading && <ParticleField />}
 
       {/* Main App Page Content - always rendered in DOM for SEO & LCP */}
       <motion.div

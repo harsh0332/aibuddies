@@ -1,485 +1,383 @@
 "use client";
 
-import React, { useRef, useMemo } from "react";
-import { Canvas, useFrame, useThree } from "@react-three/fiber";
+import React, { useRef, useEffect, useState } from "react";
 import * as THREE from "three";
 
-// EXPOSED TWEAK KNOBS
-export const PARTICLE_COUNT = 4000;
-export const SPHERE_RADIUS = 1.4; // Reduced to fit perfectly beside left-aligned headline
-export const MORPH_LERP = 0.08;
-export const ROTATION_SPEED = 0.08;
-export const REPEL_RADIUS = 1.2;
-export const REPEL_FORCE = 0.6;
+/* ---- TWEAK KNOBS ---------------------------------------------------------- */
+const PARTICLE_COUNT       = 4000;
+const SPHERE_RADIUS        = 1.4;
+const PARTICLE_SIZE        = 0.04;   // bumped from 0.025 for crisp visibility
+const REPEL_RADIUS         = 1.2;
+const REPEL_FORCE          = 0.6;
+const RETURN_LERP          = 0.08;
+const MORPH_LERP           = 0.08;
+const ROTATION_SPEED       = 0.08;
+const HERO_SPHERE_OFFSET_X = 1.6;
 
-// SHAPE GENERATORS (all output Float32Array of size count * 3)
+/* ---- DESIGN TOKENS -------------------------------------------------------- */
+const TOKENS = {
+  particle: '#43C2D8',
+  accent:   '#2BA0DC',
+  deep:     '#0E5FB5',
+  base:     '#000000',
+  raised:   '#050507',
+  text:     '#f6f6fd',
+  text2:    'rgba(246,246,253,0.6)',
+};
 
-// 1. Fibonacci Sphere (Hero)
-function generateSphere(count: number, radius: number): Float32Array {
-  const arr = new Float32Array(count * 3);
-  const goldenRatio = (1 + Math.sqrt(5)) / 2;
-  const angleIncrement = 2 * Math.PI * goldenRatio;
-
+/* ============================================================================
+   SHAPE GENERATORS  — each returns a Float32Array of length PARTICLE_COUNT*3.
+   Equal length so any shape morphs into any other 1:1 by particle index.
+   ========================================================================== */
+function makeSphere(count: number): Float32Array {
+  const a = new Float32Array(count * 3);
+  const phi = Math.PI * (3 - Math.sqrt(5)); // golden angle
   for (let i = 0; i < count; i++) {
-    const t = i / count;
-    const y = 1 - 2 * t;
-    const r = Math.sqrt(1 - y * y);
-    const theta = angleIncrement * i;
-
-    const x = Math.cos(theta) * r * radius;
-    const z = Math.sin(theta) * r * radius;
-    const yVal = y * radius;
-
-    const idx = i * 3;
-    arr[idx] = x;
-    arr[idx + 1] = yVal;
-    arr[idx + 2] = z;
+    const y = 1 - (i / (count - 1)) * 2;
+    const r = Math.sqrt(Math.max(0, 1 - y * y));
+    const th = phi * i;
+    a[i * 3]     = Math.cos(th) * r * SPHERE_RADIUS;
+    a[i * 3 + 1] = y * SPHERE_RADIUS;
+    a[i * 3 + 2] = Math.sin(th) * r * SPHERE_RADIUS;
   }
-  return arr;
+  return a;
 }
 
-// 2. Chat Bubble (AI Chatbots)
-function generateChatBubble(count: number, radius: number): Float32Array {
-  const arr = new Float32Array(count * 3);
+function makeChatBubble(count: number): Float32Array {
+  const a = new Float32Array(count * 3);
+  const W = 1.9, H = 1.25, rad = 0.55, yShift = 0.32;
+  const tailN = Math.floor(count * 0.09);
+  const bodyN = count - tailN;
+  let i = 0;
+  // rounded-rectangle body fill (rejection sample)
+  while (i < bodyN) {
+    const x = (Math.random() * 2 - 1) * W;
+    const y = (Math.random() * 2 - 1) * H;
+    const ax = Math.abs(x) - (W - rad);
+    const ay = Math.abs(y) - (H - rad);
+    const inside = (ax < 0 || ay < 0) ? true : (ax * ax + ay * ay) < rad * rad;
+    if (inside) {
+      a[i * 3]     = x;
+      a[i * 3 + 1] = y + yShift;
+      a[i * 3 + 2] = (Math.random() * 2 - 1) * 0.12;
+      i++;
+    }
+  }
+  // little tail (bottom-left triangle)
+  const A = [-0.45, -H + yShift], B = [-1.05, -H - 0.55 + yShift], C = [0.15, -H + yShift];
+  for (let k = 0; k < tailN; k++) {
+    let r1 = Math.random(), r2 = Math.random();
+    if (r1 + r2 > 1) { r1 = 1 - r1; r2 = 1 - r2; }
+    a[i * 3]     = A[0] + r1 * (B[0] - A[0]) + r2 * (C[0] - A[0]);
+    a[i * 3 + 1] = A[1] + r1 * (B[1] - A[1]) + r2 * (C[1] - A[1]);
+    a[i * 3 + 2] = (Math.random() * 2 - 1) * 0.08;
+    i++;
+  }
+  return a;
+}
+
+function makeNetworkHub(count: number): Float32Array {
+  const a = new Float32Array(count * 3);
+  const nodes = 6, R = 1.55;
+  const centers = [[0, 0]];
+  for (let n = 0; n < nodes; n++) {
+    const ang = (n / nodes) * Math.PI * 2 - Math.PI / 2;
+    centers.push([Math.cos(ang) * R, Math.sin(ang) * R]);
+  }
+  const centerN = Math.floor(count * 0.16);
+  const spokeN  = Math.floor(count * 0.50);
+  const satN    = count - centerN - spokeN;
+  let i = 0;
+  for (let k = 0; k < centerN; k++) {
+    const ang = Math.random() * Math.PI * 2, rr = Math.sqrt(Math.random()) * 0.30;
+    a[i * 3] = Math.cos(ang) * rr; a[i * 3 + 1] = Math.sin(ang) * rr; a[i * 3 + 2] = (Math.random() * 2 - 1) * 0.1; i++;
+  }
+  for (let k = 0; k < satN; k++) {
+    const node = 1 + Math.floor(Math.random() * nodes);
+    const ang = Math.random() * Math.PI * 2, rr = Math.sqrt(Math.random()) * 0.24;
+    a[i * 3] = centers[node][0] + Math.cos(ang) * rr;
+    a[i * 3 + 1] = centers[node][1] + Math.sin(ang) * rr;
+    a[i * 3 + 2] = (Math.random() * 2 - 1) * 0.1; i++;
+  }
+  for (let k = 0; k < spokeN; k++) {
+    const node = 1 + Math.floor(Math.random() * nodes);
+    const t = Math.random();
+    a[i * 3]     = centers[node][0] * t + (Math.random() * 2 - 1) * 0.035;
+    a[i * 3 + 1] = centers[node][1] * t + (Math.random() * 2 - 1) * 0.035;
+    a[i * 3 + 2] = (Math.random() * 2 - 1) * 0.05; i++;
+  }
+  return a;
+}
+
+function makeSoundWaves(count: number): Float32Array {
+  const a = new Float32Array(count * 3);
+  const bars = 15, spread = 3.4;
+  const heights: number[] = [];
+  for (let b = 0; b < bars; b++) {
+    const x = b / (bars - 1);
+    heights[b] = 0.28 + Math.sin(x * Math.PI) * 1.35 * (0.55 + 0.45 * Math.abs(Math.sin(b * 1.7 + 0.6)));
+  }
   for (let i = 0; i < count; i++) {
-    const theta = (i / count) * 2 * Math.PI;
-    const thickness = (Math.random() - 0.5) * 0.25; // Z depth thickness
-    
-    let x = 0;
-    let y = 0;
-    
-    // Bottom left corner tail is around theta = 4.3 to 4.7
-    if (theta > 4.3 && theta < 4.7) {
-      const peak = 1 - Math.abs((theta - 4.5) / 0.2); // 0 at edges, 1 at 4.5
-      const r = radius * (1.0 + peak * 0.45);
-      x = Math.cos(theta) * r;
-      y = Math.sin(theta) * r;
-    } else {
-      x = Math.cos(theta) * radius;
-      y = Math.sin(theta) * radius;
-    }
-    
-    // Add some random inner fill particles to make it look solid
-    if (Math.random() < 0.2) {
-      const rFactor = Math.random();
-      x *= rFactor;
-      y *= rFactor;
-    }
-    
-    const idx = i * 3;
-    arr[idx] = x;
-    arr[idx + 1] = y;
-    arr[idx + 2] = thickness;
+    const b = i % bars;
+    const h = heights[b];
+    a[i * 3]     = (b / (bars - 1) - 0.5) * spread + (Math.random() * 2 - 1) * 0.035;
+    a[i * 3 + 1] = (Math.random() * 2 - 1) * h;
+    a[i * 3 + 2] = (Math.random() * 2 - 1) * 0.06;
   }
-  return arr;
+  return a;
 }
 
-// 3. Network Hub / Connected Nodes (WhatsApp Automation)
-function generateNetworkHub(count: number): Float32Array {
-  const arr = new Float32Array(count * 3);
-  const nodeCount = 5;
-  const nodes = [];
-  
-  for (let n = 0; n < nodeCount; n++) {
-    const theta = (n / nodeCount) * 2 * Math.PI;
-    nodes.push({
-      x: Math.cos(theta) * 1.8,
-      y: Math.sin(theta) * 1.8,
-      z: (Math.random() - 0.5) * 0.5
-    });
+function makeBullseye(count: number): Float32Array {
+  const a = new Float32Array(count * 3);
+  const radii = [0.5, 1.0, 1.5, 1.95];
+  const total = radii.reduce((s, r) => s + r, 0);
+  const centerN = Math.floor(count * 0.08);
+  let i = 0;
+  for (let k = 0; k < centerN; k++) {
+    const ang = Math.random() * Math.PI * 2, rr = Math.sqrt(Math.random()) * 0.18;
+    a[i * 3] = Math.cos(ang) * rr; a[i * 3 + 1] = Math.sin(ang) * rr; a[i * 3 + 2] = 0; i++;
   }
+  const remain = count - centerN;
+  for (let r = 0; r < radii.length; r++) {
+    const n = (r === radii.length - 1) ? count - i : Math.floor(remain * radii[r] / total);
+    for (let k = 0; k < n && i < count; k++) {
+      const ang = Math.random() * Math.PI * 2;
+      const rr = radii[r] + (Math.random() * 2 - 1) * 0.05;
+      a[i * 3] = Math.cos(ang) * rr; a[i * 3 + 1] = Math.sin(ang) * rr; a[i * 3 + 2] = (Math.random() * 2 - 1) * 0.04; i++;
+    }
+  }
+  while (i < count) { a[i * 3] = 0; a[i * 3 + 1] = 0; a[i * 3 + 2] = 0; i++; }
+  return a;
+}
 
+function makeGear(count: number): Float32Array {
+  const a = new Float32Array(count * 3);
+  const outer = 1.7, toothH = 0.34, inner = 0.6;
+  const teeth = 9;
   for (let i = 0; i < count; i++) {
-    const idx = i * 3;
-    const r = i / count;
-    
-    if (r < 0.4) {
-      // Central Core Sphere
-      const theta = Math.random() * 2 * Math.PI;
-      const phi = Math.acos((Math.random() * 2) - 1);
-      const rad = Math.random() * 0.5;
-      
-      arr[idx] = rad * Math.sin(phi) * Math.cos(theta);
-      arr[idx + 1] = rad * Math.sin(phi) * Math.sin(theta);
-      arr[idx + 2] = rad * Math.cos(phi);
-    } else if (r < 0.75) {
-      // Outer Nodes
-      const nodeIdx = Math.floor(Math.random() * nodeCount);
-      const node = nodes[nodeIdx];
-      
-      const theta = Math.random() * 2 * Math.PI;
-      const phi = Math.acos((Math.random() * 2) - 1);
-      const rad = Math.random() * 0.18;
-      
-      arr[idx] = node.x + rad * Math.sin(phi) * Math.cos(theta);
-      arr[idx + 1] = node.y + rad * Math.sin(phi) * Math.sin(theta);
-      arr[idx + 2] = node.z + rad * Math.cos(phi);
-    } else {
-      // Connection Lines
-      const nodeIdx = Math.floor(Math.random() * nodeCount);
-      const node = nodes[nodeIdx];
-      
-      const progress = Math.random();
-      const jitterX = (Math.random() - 0.5) * 0.05;
-      const jitterY = (Math.random() - 0.5) * 0.05;
-      const jitterZ = (Math.random() - 0.5) * 0.05;
-      
-      arr[idx] = node.x * progress + jitterX;
-      arr[idx + 1] = node.y * progress + jitterY;
-      arr[idx + 2] = node.z * progress + jitterZ;
-    }
+    const ang = Math.random() * Math.PI * 2;
+    const tooth = Math.sin(ang * teeth) > 0 ? toothH : 0;        // blocky teeth
+    const outR = outer - toothH / 2 + tooth;
+    const rr = inner + Math.sqrt(Math.random()) * (outR - inner); // annulus fill (hole in center)
+    a[i * 3]     = Math.cos(ang) * rr;
+    a[i * 3 + 1] = Math.sin(ang) * rr;
+    a[i * 3 + 2] = (Math.random() * 2 - 1) * 0.08;
   }
-  return arr;
+  return a;
 }
 
-// 4. Sound Waves / Sine ripples (Voice Agents)
-function generateSoundWaves(count: number): Float32Array {
-  const arr = new Float32Array(count * 3);
-  const channels = 4;
-  
-  for (let i = 0; i < count; i++) {
-    const idx = i * 3;
-    const channelIdx = i % channels;
-    const x = ((i / count) - 0.5) * 4.4;
-    
-    const channelY = (channelIdx - (channels - 1) / 2) * 0.6;
-    const freq = 2.5 + channelIdx * 0.8;
-    const amp = 0.35 - channelIdx * 0.05;
-    const y = channelY + Math.sin(x * freq) * amp;
-    const z = (Math.random() - 0.5) * 0.3;
-    
-    arr[idx] = x;
-    arr[idx + 1] = y;
-    arr[idx + 2] = z;
+/* round soft particle sprite */
+function makeSprite(): THREE.CanvasTexture {
+  const c = document.createElement('canvas');
+  c.width = c.height = 64;
+  const g = c.getContext('2d');
+  if (g) {
+    const grad = g.createRadialGradient(32, 32, 0, 32, 32, 32);
+    grad.addColorStop(0,   'rgba(255,255,255,1)');
+    grad.addColorStop(0.3, 'rgba(255,255,255,0.85)');
+    grad.addColorStop(1,   'rgba(255,255,255,0)');
+    g.fillStyle = grad;
+    g.fillRect(0, 0, 64, 64);
   }
-  return arr;
+  return new THREE.CanvasTexture(c);
 }
 
-// 5. Target Bullseye / Concentric Rings (Lead Qualification)
-function generateTargetBullseye(count: number): Float32Array {
-  const arr = new Float32Array(count * 3);
-  
-  for (let i = 0; i < count; i++) {
-    const idx = i * 3;
-    const r = i / count;
-    
-    let x = 0;
-    let y = 0;
-    let z = (Math.random() - 0.5) * 0.15;
-    
-    if (r < 0.7) {
-      const ringIdx = Math.floor(Math.random() * 3);
-      const ringRadius = ringIdx === 0 ? 0.5 : ringIdx === 1 ? 1.2 : 1.9;
-      const theta = Math.random() * 2 * Math.PI;
-      x = Math.cos(theta) * ringRadius;
-      y = Math.sin(theta) * ringRadius;
-    } else {
-      const lineIdx = Math.random() < 0.5 ? 0 : 1;
-      const pos = ((Math.random() - 0.5) * 4.0);
-      
-      if (lineIdx === 0) {
-        x = pos;
-        y = (Math.random() - 0.5) * 0.05;
-      } else {
-        x = (Math.random() - 0.5) * 0.05;
-        y = pos;
-      }
-    }
-    
-    arr[idx] = x;
-    arr[idx + 1] = y;
-    arr[idx + 2] = z;
-  }
-  return arr;
-}
-
-// 6. Gear Wheel / Automated Support (AI Customer Support)
-function generateGearWheel(count: number): Float32Array {
-  const arr = new Float32Array(count * 3);
-  
-  for (let i = 0; i < count; i++) {
-    const idx = i * 3;
-    const theta = (i / count) * 2 * Math.PI;
-    const z = (Math.random() - 0.5) * 0.4;
-    const isInner = Math.random() < 0.25;
-    
-    let r = 0;
-    if (isInner) {
-      r = 0.45;
-    } else {
-      const baseR = 1.3;
-      const toothAmp = 0.28;
-      const teethCount = 8;
-      const toothSignal = Math.sign(Math.sin(teethCount * theta)) * 0.5 + 0.5;
-      r = baseR + toothSignal * toothAmp;
-      r += (Math.random() - 0.5) * 0.05;
-    }
-    
-    const x = Math.cos(theta) * r;
-    const y = Math.sin(theta) * r;
-    
-    arr[idx] = x;
-    arr[idx + 1] = y;
-    arr[idx + 2] = z;
-  }
-  return arr;
-}
-
-function Particles() {
-  const pointsRef = useRef<THREE.Points>(null);
-  const parentGroupRef = useRef<THREE.Group>(null);
-  const { viewport } = useThree();
-  const stageRef = useRef<number>(0);
-  const dampenedMouse = useRef(new THREE.Vector3(0, 0, 0));
-
-  // 1. Generate position shapes once and spatially sort them by Y coordinate
-  const shapes = useMemo(() => {
-    const rawShapes = [
-      generateSphere(PARTICLE_COUNT, SPHERE_RADIUS),
-      generateChatBubble(PARTICLE_COUNT, 1.8),
-      generateNetworkHub(PARTICLE_COUNT),
-      generateSoundWaves(PARTICLE_COUNT),
-      generateTargetBullseye(PARTICLE_COUNT),
-      generateGearWheel(PARTICLE_COUNT),
-    ];
-
-    // Spatially sort coordinates by Y value to ensure clean wave morph transitions
-    const sortCoords = (arr: Float32Array) => {
-      const count = arr.length / 3;
-      const pts = [];
-      for (let i = 0; i < count; i++) {
-        const idx = i * 3;
-        pts.push({ x: arr[idx], y: arr[idx + 1], z: arr[idx + 2] });
-      }
-      pts.sort((a, b) => a.y - b.y);
-      
-      const sorted = new Float32Array(arr.length);
-      for (let i = 0; i < count; i++) {
-        const idx = i * 3;
-        sorted[idx] = pts[i].x;
-        sorted[idx + 1] = pts[i].y;
-        sorted[idx + 2] = pts[i].z;
-      }
-      return sorted;
-    };
-
-    return rawShapes.map(sortCoords);
-  }, []);
-
-  // Allocate current running positions buffer initialized to sorted sphere
-  const currentPositions = useMemo(() => {
-    return new Float32Array(shapes[0]);
-  }, [shapes]);
-
-  // Generate jitter direction values for the mouse repel
-  const jitterOffsets = useMemo(() => {
-    const jitter = new Float32Array(PARTICLE_COUNT * 3);
-    for (let i = 0; i < PARTICLE_COUNT * 3; i++) {
-      jitter[i] = (Math.random() - 0.5) * 0.15;
-    }
-    return jitter;
-  }, []);
-
-  useFrame((state, delta) => {
-    if (!pointsRef.current) return;
-
-    const points = pointsRef.current;
-    const geometry = points.geometry;
-    const positions = geometry.attributes.position.array as Float32Array;
-    const time = state.clock.getElapsedTime();
-
-    // Read targetStage from window and smoothly interpolate it in the frame loop
-    const targetStage = (window as any).targetStage !== undefined ? (window as any).targetStage : 0;
-    stageRef.current = THREE.MathUtils.lerp(stageRef.current, targetStage, 0.08);
-    const stage = stageRef.current;
-
-    // Toggle points visible state based on stage (unmounted stage threshold = 5.3)
-    const isHidden = stage >= 5.3;
-    points.visible = !isHidden;
-
-    if (isHidden) return;
-
-    // Slow rotation
-    points.rotation.y += delta * ROTATION_SPEED;
-
-    // Calculate mouse interaction locally if stage < 0.8 (Hero)
-    const isInteracting = stage < 0.8;
-    let localMouse = new THREE.Vector3();
-
-    if (isInteracting) {
-      const mouseWorld = new THREE.Vector3(
-        state.pointer.x * (viewport.width / 2),
-        state.pointer.y * (viewport.height / 2),
-        0
-      );
-      dampenedMouse.current.lerp(mouseWorld, 0.08);
-      localMouse.copy(dampenedMouse.current);
-      points.updateMatrixWorld();
-      const localMatrix = points.matrixWorld.clone().invert();
-      localMouse.applyMatrix4(localMatrix);
-    }
-
-    // Determine shapes to interpolate between based on stage float
-    const baseStage = Math.min(Math.floor(stage), 4);
-    const nextStage = Math.min(baseStage + 1, 5);
-    const ratio = stage - baseStage;
-
-    const baseArray = shapes[baseStage];
-    const nextArray = shapes[nextStage];
-
-    for (let i = 0; i < PARTICLE_COUNT; i++) {
-      const idx = i * 3;
-
-      // 1. Scrub-interpolated target position between current and next stage
-      const targetBaseX = baseArray[idx];
-      const targetBaseY = baseArray[idx + 1];
-      const targetBaseZ = baseArray[idx + 2];
-
-      const targetNextX = nextArray[idx];
-      const targetNextY = nextArray[idx + 1];
-      const targetNextZ = nextArray[idx + 2];
-
-      let targetX = targetBaseX * (1 - ratio) + targetNextX * ratio;
-      let targetY = targetBaseY * (1 - ratio) + targetNextY * ratio;
-      let targetZ = targetBaseZ * (1 - ratio) + targetNextZ * ratio;
-
-      // Calculate particle radial normal direction from origin (for organic wave ripples)
-      const baseLen = Math.sqrt(targetX * targetX + targetY * targetY + targetZ * targetZ) || 0.001;
-      const nx = targetX / baseLen;
-      const ny = targetY / baseLen;
-      const nz = targetZ / baseLen;
-
-      // A. Constant organic background breathing (makes the sphere feel alive)
-      const breathe = Math.sin(time * 1.8 + baseLen * 2) * 0.04;
-      targetX += nx * breathe;
-      targetY += ny * breathe;
-      targetZ += nz * breathe;
-
-      // B. Mouse spotlight dent & warp (Hero mode only)
-      if (isInteracting) {
-        // Vector from particle base target position to mouse position
-        const dx = localMouse.x - targetX;
-        const dy = localMouse.y - targetY;
-        const dz = localMouse.z - targetZ;
-        const dist = Math.sqrt(dx * dx + dy * dy + dz * dz);
-
-        const INFLUENCE_RADIUS = 2.4;
-
-        if (dist < INFLUENCE_RADIUS) {
-          const tFactor = 1.0 - dist / INFLUENCE_RADIUS;
-          
-          // Indentation: push particles INWARDS (towards center of sphere)
-          // Using a smooth quadratic curve for organic crater indent
-          const dentForce = -0.55 * tFactor * tFactor;
-          
-          // Attraction: pull particles gently towards the cursor's spatial coordinates
-          const pullForce = 0.15 * tFactor * tFactor;
-
-          targetX += nx * dentForce + (localMouse.x - targetX) * pullForce;
-          targetY += ny * dentForce + (localMouse.y - targetY) * pullForce;
-          targetZ += nz * dentForce + (localMouse.z - targetZ) * pullForce;
-        }
-      }
-
-      // 3. Lerp particle positions toward target positions
-      positions[idx] += (targetX - positions[idx]) * MORPH_LERP;
-      positions[idx + 1] += (targetY - positions[idx + 1]) * MORPH_LERP;
-      positions[idx + 2] += (targetZ - positions[idx + 2]) * MORPH_LERP;
-    }
-
-    geometry.attributes.position.needsUpdate = true;
-
-    // Responsive 3D Position and Scale Interpolation based on stage
-    // Hero Group positioning: shifted further right to sit beside headline text without overflow
-    const t = Math.min(Math.max(stage, 0), 1.0); // clamped 0..1 translation progress
-
-    const heroX = viewport.width * 0.24;
-    const servicesX = viewport.width * 0.26;
-
-    const targetGroupX = heroX * (1 - t) + servicesX * t;
-    const targetGroupY = -viewport.height * 0.05 * t;
-    const targetScale = 1.0 * (1 - t) + 1.25 * t;
-
-    // Apply translations and scales to parent group
-    if (parentGroupRef.current) {
-      const parentGroup = parentGroupRef.current;
-      
-      // Decoupled smooth mouse-parallax shift to parent group position (only in Hero section, stage < 0.8)
-      const parallaxX = isInteracting ? state.pointer.x * (viewport.width * 0.07) : 0;
-      const parallaxY = isInteracting ? state.pointer.y * (viewport.height * 0.07) : 0;
-
-      parentGroup.position.x = THREE.MathUtils.lerp(parentGroup.position.x, targetGroupX + parallaxX, 0.08);
-      parentGroup.position.y = THREE.MathUtils.lerp(parentGroup.position.y, targetGroupY + parallaxY, 0.08);
-      parentGroup.scale.setScalar(THREE.MathUtils.lerp(parentGroup.scale.x, targetScale, 0.08));
-
-      // Decoupled 3D LookAt / Tilt (only on Hero stage)
-      if (isInteracting) {
-        // Rotate around X based on mouse Y (look up/down)
-        const targetTiltX = -state.pointer.y * 0.35;
-        // Rotate around Y based on mouse X (look left/right)
-        const targetTiltY = state.pointer.x * 0.35;
-
-        parentGroup.rotation.x = THREE.MathUtils.lerp(parentGroup.rotation.x, targetTiltX, 0.08);
-        parentGroup.rotation.y = THREE.MathUtils.lerp(parentGroup.rotation.y, targetTiltY, 0.08);
-        parentGroup.rotation.z = THREE.MathUtils.lerp(parentGroup.rotation.z, 0, 0.08);
-      } else {
-        // Reset tilt on stage transition
-        parentGroup.rotation.x = THREE.MathUtils.lerp(parentGroup.rotation.x, 0, 0.08);
-        parentGroup.rotation.y = THREE.MathUtils.lerp(parentGroup.rotation.y, 0, 0.08);
-        parentGroup.rotation.z = THREE.MathUtils.lerp(parentGroup.rotation.z, 0, 0.08);
-      }
-    }
-
-    // Keep child points clean: handles Y spin and resets any other values to prevent double transformations
-    points.rotation.x = 0;
-    points.rotation.z = 0;
-    points.position.set(0, 0, 0);
-    points.scale.setScalar(1);
-
-    // Calculate material opacity based on stage and write directly to material property
-    let opacity = 0.85;
-    if (stage > 4.8) {
-      opacity = Math.max(0, 0.85 * (1 - (stage - 4.8) / 0.4));
-    }
-    if (points.material) {
-      (points.material as THREE.PointsMaterial).opacity = opacity;
-    }
-  });
-
-  return (
-    <group ref={parentGroupRef}>
-      <points ref={pointsRef}>
-        <bufferGeometry>
-          <bufferAttribute
-            attach="attributes-position"
-            args={[currentPositions, 3]}
-          />
-        </bufferGeometry>
-        <pointsMaterial
-          color="#43C2D8"
-          size={0.025}
-          transparent={true}
-          opacity={0.85}
-          blending={THREE.AdditiveBlending}
-          depthWrite={false}
-          sizeAttenuation={true}
-        />
-      </points>
-    </group>
-  );
-}
+const clamp = (v: number, a: number, b: number) => Math.min(b, Math.max(a, v));
+const smoothstep = (e0: number, e1: number, x: number) => { 
+  const t = clamp((x - e0) / (e1 - e0), 0, 1); 
+  return t * t * (3 - 2 * t); 
+};
 
 export default function ParticleField() {
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+  const [isStatic, setIsStatic] = useState(false);
+
+  // detect mobile / reduced-motion once
+  useEffect(() => {
+    const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const coarse  = window.matchMedia('(pointer: coarse)').matches;
+    setIsStatic(reduced || coarse);
+  }, []);
+
+  useEffect(() => {
+    if (isStatic) return;
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+
+    const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+
+    const scene = new THREE.Scene();
+    const camera = new THREE.PerspectiveCamera(55, 1, 0.1, 100);
+    camera.position.z = 5;
+
+    const shapes = [
+      makeSphere(PARTICLE_COUNT),
+      makeChatBubble(PARTICLE_COUNT),
+      makeNetworkHub(PARTICLE_COUNT),
+      makeSoundWaves(PARTICLE_COUNT),
+      makeBullseye(PARTICLE_COUNT),
+      makeGear(PARTICLE_COUNT),
+    ];
+    const current = new Float32Array(shapes[0]); // start as sphere
+    const geo = new THREE.BufferGeometry();
+    geo.setAttribute('position', new THREE.BufferAttribute(current, 3));
+
+    const sprite = makeSprite();
+    const mat = new THREE.PointsMaterial({
+      size: PARTICLE_SIZE,
+      map: sprite,
+      color: new THREE.Color(TOKENS.particle),
+      transparent: true,
+      blending: THREE.AdditiveBlending,
+      depthWrite: false,
+      depthTest: false,
+      sizeAttenuation: true,
+    });
+    const points = new THREE.Points(geo, mat);
+    const group = new THREE.Group();
+    group.add(points);
+    group.position.x = HERO_SPHERE_OFFSET_X;
+    scene.add(group);
+
+    const plane = new THREE.Plane(new THREE.Vector3(0, 0, 1), 0); // z = 0
+    const raycaster = new THREE.Raycaster();
+    const mouseWorld = new THREE.Vector3();
+    const ndc = new THREE.Vector2();
+
+    const mouse = { x: 0, y: 0, active: false };
+
+    let spinY = 0;
+    let tiltX = 0, tiltY = 0;
+    let curShape = 0;
+    let raf = 0, last = performance.now();
+    let disposed = false;
+
+    function resize() {
+      const w = window.innerWidth, h = window.innerHeight;
+      renderer.setSize(w, h, false);
+      camera.aspect = w / h;
+      camera.updateProjectionMatrix();
+    }
+    resize();
+    window.addEventListener('resize', resize);
+
+    function onMove(e: PointerEvent) {
+      mouse.x = (e.clientX / window.innerWidth) * 2 - 1;
+      mouse.y = -((e.clientY / window.innerHeight) * 2 - 1);
+      mouse.active = true;
+    }
+    function onLeave() { mouse.active = false; }
+    window.addEventListener('pointermove', onMove);
+    window.addEventListener('pointerout', onLeave);
+
+    function frame(now: number) {
+      if (disposed) return;
+      const dt = Math.min(0.05, (now - last) / 1000);
+      last = now;
+
+      /* ---- scroll-driven state (read each frame, no scroll-jank) ---- */
+      const heroEl = document.getElementById('hero');
+      const wrapEl = document.getElementById('services-container');
+
+      const heroRect = heroEl ? heroEl.getBoundingClientRect() : null;
+      const heroProg = heroRect ? clamp(-heroRect.top / heroRect.height, 0, 1) : 0;
+
+      const wrapRect = wrapEl ? wrapEl.getBoundingClientRect() : null;
+      const scrollable = wrapRect ? Math.max(1, wrapRect.height - window.innerHeight) : 1;
+      const svcProg = wrapRect ? clamp(-wrapRect.top / scrollable, 0, 1) : 0;
+      const stuck = wrapRect ? wrapRect.top <= 0 : false;
+      const step = clamp(Math.floor(svcProg * 5), 0, 4);
+      const shapeIndex = stuck ? step + 1 : 0;
+
+      if (shapeIndex !== curShape) curShape = shapeIndex;
+
+      // canvas opacity: fade out as services end
+      const op = 1 - smoothstep(0.84, 1.0, svcProg);
+      if (canvas) canvas.style.opacity = String(op);
+
+      /* ---- group position: right half in hero, drift down on travel ---- */
+      const targetGX = HERO_SPHERE_OFFSET_X;
+      const targetGY = stuck ? 0 : -heroProg * 1.4;
+      group.position.x += (targetGX - group.position.x) * (1 - Math.pow(1 - 0.1, dt * 60));
+      group.position.y += (targetGY - group.position.y) * (1 - Math.pow(1 - 0.1, dt * 60));
+
+      /* ---- mouse world point (for repel) ---- */
+      ndc.set(mouse.x, mouse.y);
+      raycaster.setFromCamera(ndc, camera);
+      raycaster.ray.intersectPlane(plane, mouseWorld);
+
+      /* ---- rotation: auto-spin + cursor tilt ---- */
+      spinY += ROTATION_SPEED * dt;
+      const wantTiltX = mouse.active ? mouse.y * 0.22 : 0;
+      const wantTiltY = mouse.active ? mouse.x * 0.22 : 0;
+      tiltX += (wantTiltX - tiltX) * (1 - Math.pow(1 - 0.06, dt * 60));
+      tiltY += (wantTiltY - tiltY) * (1 - Math.pow(1 - 0.06, dt * 60));
+      group.rotation.y = spinY + tiltY;
+      group.rotation.x = tiltX;
+
+      /* ---- per-particle: lerp toward target, apply hero repel ---- */
+      const target = shapes[curShape];
+      const isHero = curShape === 0;
+      const rate = isHero ? RETURN_LERP : MORPH_LERP;
+      const f = 1 - Math.pow(1 - rate, dt * 60);
+      const gx = group.position.x, gy = group.position.y;
+
+      for (let i = 0; i < PARTICLE_COUNT; i++) {
+        const ix = i * 3, iy = ix + 1, iz = ix + 2;
+        // morph / return lerp
+        current[ix] += (target[ix] - current[ix]) * f;
+        current[iy] += (target[iy] - current[iy]) * f;
+        current[iz] += (target[iz] - current[iz]) * f;
+
+        // mouse repel only in hero (sphere reacts, then lerps back)
+        if (isHero && mouse.active) {
+          const wx = current[ix] + gx, wy = current[iy] + gy, wz = current[iz];
+          const dx = wx - mouseWorld.x, dy = wy - mouseWorld.y, dz = wz - mouseWorld.z;
+          const dist = Math.sqrt(dx * dx + dy * dy + dz * dz);
+          if (dist < REPEL_RADIUS && dist > 0.0001) {
+            const push = (1 - dist / REPEL_RADIUS) * REPEL_FORCE;
+            current[ix] += (dx / dist) * push;
+            current[iy] += (dy / dist) * push;
+            current[iz] += (dz / dist) * push;
+          }
+        }
+      }
+      geo.attributes.position.needsUpdate = true;
+
+      renderer.render(scene, camera);
+      raf = requestAnimationFrame(frame);
+    }
+    raf = requestAnimationFrame(frame);
+
+    return () => {
+      disposed = true;
+      cancelAnimationFrame(raf);
+      window.removeEventListener('resize', resize);
+      window.removeEventListener('pointermove', onMove);
+      window.removeEventListener('pointerout', onLeave);
+      geo.dispose();
+      mat.dispose();
+      sprite.dispose();
+      renderer.dispose();
+    };
+  }, [isStatic]);
+
+  if (isStatic) {
+    return (
+      <div
+        aria-hidden
+        className="pointer-events-none absolute inset-0 z-0 h-screen w-screen"
+        style={{ background: 'radial-gradient(70% 60% at 70% 45%, rgba(43,194,216,0.28), rgba(14,95,181,0.05) 50%, rgba(0,0,0,0) 75%)' }}
+      />
+    );
+  }
+
   return (
-    <div className="fixed inset-0 w-full h-full pointer-events-none z-0 select-none bg-transparent">
-      <Canvas
-        camera={{ position: [0, 0, 5], fov: 60 }}
-        gl={{ antialias: true, alpha: true }}
-        style={{ pointerEvents: "none" }}
-      >
-        <ambientLight intensity={1.5} />
-        <Particles />
-      </Canvas>
-    </div>
+    <canvas
+      ref={canvasRef}
+      className="pointer-events-none fixed inset-0 z-0 h-screen w-screen"
+      style={{ transition: 'opacity 0.2s linear' }}
+    />
   );
 }
