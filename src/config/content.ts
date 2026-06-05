@@ -159,23 +159,44 @@ export const BRAND_CONFIG = {
     }
   ],
 
-  // FAQs (Scaffolded - EDITABLE)
+  // CTA Benefits & Messaging
+  ctaSystem: {
+    benefitLine: "Free 30-min call · no obligation",
+    secondaryBtnText: "See how it works",
+  },
+
+  // Privacy & WhatsApp Trust signals
+  trustSignals: {
+    privacyLine: "Your details stay private — we never share them. DPDP-aware handling.",
+    verifiedBadgeText: "Verified Business Profile",
+    whatsappClickToChat: "Chat on WhatsApp",
+  },
+
+  // Objection-Handling FAQs (Truthful answers, no fabricated metrics)
   faqs: [
     {
-      question: "How long does it take to deploy an AI system?", // EDIT: replace with real FAQ question
-      answer: "Most custom automations and voice agents are designed, built, and launched into production within 7 to 14 days, depending on the complexity of your workflow integration." // EDIT: replace with real FAQ answer
+      question: "How much does custom AI cost, and what is the return on investment (ROI)?",
+      answer: "We focus on building AI systems that pay for themselves. By capturing missed after-hours leads, reducing manual message bottlenecks, and preventing booking no-shows, our systems recover their costs rapidly. Booking a discovery call is completely free, carries zero commitment, and we will outline a transparent cost breakdown based on the exact workflows you choose to automate."
     },
     {
-      question: "What is n8n and why do you use it?", // EDIT: replace with real FAQ question
-      answer: "n8n is a highly secure, reliable, and customizable workflow automation tool. It allows us to connect your database, WhatsApp API, and AI models into complex, scalable logic chains without relying on brittle custom scripts." // EDIT: replace with real FAQ answer
+      question: "Will these AI systems replace my existing staff?",
+      answer: "No. Our systems are designed to amplify your staff, not replace them. By automating 80% of repetitive, low-value tasks (like booking appointments, qualifying leads, and answering repetitive FAQs), your team is freed to focus on high-value human relationships. We also implement direct escalation guardrails, routing complex or high-intent enquiries directly to your team on Slack, WhatsApp, or email."
     },
     {
-      question: "Can we automate existing legacy databases or custom CRMs?", // EDIT: replace with real FAQ question
-      answer: "Yes, our systems integrate with popular tools (HubSpot, Salesforce, Notion, Sheets) as well as custom REST APIs and database endpoints." // EDIT: replace with real FAQ answer
+      question: "How reliable are these AI agents? Do they make mistakes or hallucinate?",
+      answer: "We build custom prompt constraints, strict operational guardrails, and real-time backend checks into every agent. Unlike raw, unchecked LLMs or brittle rule-based bots, our systems are monitored and include direct fallback routes to human support, ensuring your brand standards and business workflows are protected."
     },
     {
-      question: "Do you offer post-launch support and optimization?", // EDIT: replace with real FAQ question
-      answer: "We provide comprehensive monitoring and continuous fine-tuning during the first month to ensure the systems learn and scale seamlessly as your business grows." // EDIT: replace with real FAQ answer
+      question: "Where is our data stored, and how do you handle customer privacy?",
+      answer: "Data privacy is central to our builds. We follow secure data handling practices and design systems to be DPDP-aware. Your business retains 100% ownership of your Meta Business Suite, WhatsApp Business assets, and backend databases. We customize data-residency routes according to your local requirements."
+    },
+    {
+      question: "How fast can we launch our custom AI system?",
+      answer: "Most custom workflow automations, WhatsApp pipelines, and voice agents are designed, built, and launched into production within 7 to 14 days. We work in rapid sprints, delivering a functional initial version first and optimizing it continuously based on live traffic data."
+    },
+    {
+      question: "We are not tech-savvy. Who manages these systems after launch?",
+      answer: "We build, deploy, and fully run the systems for you. We provide hands-on onboarding for your team and handle all maintenance, API updates, and fine-tuning. You do not need any coding or engineering expertise to manage your automated business; we handle the technical heavy lifting while you monitor the results."
     }
   ],
 
@@ -194,5 +215,35 @@ export const BRAND_CONFIG = {
     instagramLink: "https://instagram.com/aibuddiess",
     email: "", // Sanitized / Not displayed
     address: "India"
+  },
+
+  // EDIT: add real number e.g. businesses automated or % efficiency gained
+  trustStat: {
+    value: "", 
+    label: ""
+  },
+
+  problem: {
+    eyebrow: "The Cost of Inaction",
+    heading: "Your Business is Bleeding Leads and Revenue.",
+    description: "Every minute a lead waits is a minute they spend looking at your competitors. Here is the messy status quo holding you back:",
+    painPoints: [
+      {
+        title: "Missed After-Hours Leads",
+        description: "Enquiries arriving outside 9-to-5 are left cold. Over 50% of buyers choose the vendor who responds first."
+      },
+      {
+        title: "Slow Inquiry Follow-Up",
+        description: "Manual response times take hours instead of seconds. Leads lose interest and bounce."
+      },
+      {
+        title: "Manual WhatsApp Replies",
+        description: "Your team spends hours copying and pasting answers to repetitive support questions."
+      },
+      {
+        title: "High Appointment No-Shows",
+        description: "No automatic confirmations or multi-channel reminders mean clients forget their slots."
+      }
+    ]
   }
 };

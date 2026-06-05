@@ -302,7 +302,7 @@ export default function Services({
                 variants={revealVariants}
                 className="group"
               >
-                <CornerBorders className="h-full p-8 bg-surface-raised/30 backdrop-blur-sm transition-all duration-300 hover:-translate-y-2 glow-border">
+                <CornerBorders className="h-full p-8 glass-card-premium hover:-translate-y-1.5">
                   <div className="flex flex-col gap-6 h-full justify-between">
                     <div className="flex flex-col gap-4">
                       {/* Icon */}
@@ -349,7 +349,7 @@ export default function Services({
                       opacity: isActive ? 1 : 0.4,
                     }}
                   >
-                    <CornerBorders className="h-[380px] p-6 bg-surface-raised/40 backdrop-blur-sm border-border-custom/20 flex flex-col justify-between">
+                    <CornerBorders className="h-[380px] p-6 glass-card-premium flex flex-col justify-between">
                       <div className="flex flex-col gap-4">
                         {/* Icon */}
                         <div className="p-3 bg-signature/5 w-fit rounded-lg border border-signature/20">

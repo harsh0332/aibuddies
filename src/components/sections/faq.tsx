@@ -24,12 +24,13 @@ export default function FAQ() {
   };
 
   const itemVariants = {
-    hidden: { opacity: 0, y: 20 },
+    hidden: { opacity: 0, y: 20, filter: "blur(4px)" },
     visible: {
       opacity: 1,
       y: 0,
+      filter: "blur(0px)",
       transition: {
-        duration: 0.6,
+        duration: 0.45,
         ease: [0.16, 1, 0.3, 1] as const,
       },
     },
@@ -67,11 +68,11 @@ export default function FAQ() {
               const isOpen = openIndex === index;
               return (
                 <motion.div
-                  key={index}
-                  variants={itemVariants}
-                  className="w-full"
+                   key={index}
+                   variants={itemVariants}
+                   className="w-full"
                 >
-                  <CornerBorders className="p-1 bg-surface-raised/40 backdrop-blur-sm transition-all duration-300 glow-border">
+                  <CornerBorders className="p-1 glass-card-premium">
                     <button
                       id={`faq-question-${index}`}
                       onClick={() => toggleFAQ(index)}

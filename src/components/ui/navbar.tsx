@@ -6,6 +6,7 @@ import Logo from "./logo";
 import { BRAND_CONFIG } from "@/config/content";
 import { Menu, X } from "lucide-react";
 import { scrollToElement } from "./smooth-scroll-provider";
+import Magnetic from "./magnetic";
 
 export default function Navbar() {
   const [isScrolled, setIsScrolled] = useState(false);
@@ -54,7 +55,7 @@ export default function Navbar() {
           onClick={(e) => handleLinkClick(e, "#")}
           className="focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-signature rounded-lg"
         >
-          <Logo size="sm" />
+          <Logo size="sm" variant="horizontal" />
         </a>
 
         {/* Center: Desktop Navigation Links */}
@@ -74,13 +75,15 @@ export default function Navbar() {
 
         {/* Right Side: CTA Button */}
         <div className="hidden md:block">
-          <a
-            href="#contact"
-            onClick={(e) => handleLinkClick(e, "#contact")}
-            className="inline-flex items-center justify-center px-5 py-2 text-xs font-semibold uppercase tracking-wider rounded-full bg-signature text-black border border-signature/80 hover:bg-transparent hover:text-white transition-all duration-300 hover:shadow-[0_0_15px_rgba(43,160,220,0.4)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-signature"
-          >
-            {BRAND_CONFIG.closingCTA.primaryBtn}
-          </a>
+          <Magnetic>
+            <a
+              href="#contact"
+              onClick={(e) => handleLinkClick(e, "#contact")}
+              className="inline-flex items-center justify-center px-5 py-2 text-xs font-semibold uppercase tracking-wider rounded-full bg-signature text-black border border-signature/80 hover:bg-transparent hover:text-white transition-all duration-300 hover:shadow-[0_0_15px_rgba(43,160,220,0.4)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-signature"
+            >
+              {BRAND_CONFIG.closingCTA.primaryBtn}
+            </a>
+          </Magnetic>
         </div>
 
         {/* Mobile Menu Toggle Button */}

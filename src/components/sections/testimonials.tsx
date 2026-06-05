@@ -19,10 +19,12 @@ export default function Testimonials() {
   };
 
   const containerVariants = {
-    hidden: { opacity: 0 },
+    hidden: { opacity: 0, y: 20, filter: "blur(4px)" },
     visible: {
       opacity: 1,
-      transition: { duration: 0.6 },
+      y: 0,
+      filter: "blur(0px)",
+      transition: { duration: 0.45, ease: [0.16, 1, 0.3, 1] as const },
     },
   };
 
@@ -54,7 +56,7 @@ export default function Testimonials() {
 
           {/* Testimonial Slider Card */}
           <div className="relative">
-            <CornerBorders className="p-8 md:p-12 bg-surface-raised/40 backdrop-blur-sm glow-border min-h-[260px] flex flex-col justify-between relative overflow-hidden">
+            <CornerBorders className="p-8 md:p-12 glass-card-premium min-h-[260px] flex flex-col justify-between relative overflow-hidden">
               
               {/* Background Quote SVG */}
               <Quote className="absolute right-8 top-8 h-28 w-28 text-signature/5 pointer-events-none" />

@@ -18,12 +18,13 @@ export default function Portfolio() {
   };
 
   const revealVariants = {
-    hidden: { opacity: 0, y: 30 },
+    hidden: { opacity: 0, y: 20, filter: "blur(4px)" },
     visible: {
       opacity: 1,
       y: 0,
+      filter: "blur(0px)",
       transition: {
-        duration: 0.8,
+        duration: 0.45,
         ease: [0.16, 1, 0.3, 1] as const,
       },
     },
@@ -65,8 +66,9 @@ export default function Portfolio() {
                 key={client.name}
                 variants={revealVariants}
                 className="group"
+                data-cursor-label="View"
               >
-                <CornerBorders className="h-full p-8 bg-surface-raised/40 backdrop-blur-sm transition-all duration-300 hover:-translate-y-2 glow-border flex flex-col justify-between">
+                <CornerBorders className="h-full p-8 glass-card-premium hover:-translate-y-1.5 flex flex-col justify-between">
                   <div className="flex flex-col gap-6">
                     {/* Header: Service Badge */}
                     <div className="flex items-center justify-between">

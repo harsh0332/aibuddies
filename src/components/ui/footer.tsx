@@ -79,18 +79,26 @@ export default function Footer() {
         <div className="flex flex-col gap-4">
           <h4 className="text-sm font-semibold uppercase tracking-wider text-white">Get in Touch</h4>
           <ul className="flex flex-col gap-3">
-            <li>
+            <li className="flex flex-col gap-1">
               <a
                 href={BRAND_CONFIG.contact.whatsappLink}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="inline-flex items-center gap-2 text-sm text-text-tertiary hover:text-whatsapp transition-colors duration-200 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-signature rounded"
               >
-                <svg className="h-4 w-4" viewBox="0 0 24 24" fill="currentColor">
+                <svg className="h-4 w-4 shrink-0 text-whatsapp" viewBox="0 0 24 24" fill="currentColor">
                   <path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946C.003 5.324 5.328 0 11.859 0c3.166.001 6.141 1.236 8.378 3.479 2.237 2.242 3.469 5.214 3.473 8.38-.005 6.536-5.328 11.86-11.859 11.86-2.007-.001-3.98-.513-5.735-1.488L0 24zm6.59-4.846c1.6.95 3.18 1.448 4.71 1.449 5.33 0 9.67-4.34 9.67-9.671 0-2.585-1.005-5.01-2.83-6.837C16.32 2.271 13.89 1.264 11.3 1.264c-5.331 0-9.67 4.34-9.671 9.672 0 1.636.473 3.23 1.368 4.63l-.993 3.627 3.714-.974-.06-.035z" />
                 </svg>
-                <span>WhatsApp: {BRAND_CONFIG.contact.whatsapp}</span>
+                <span>{(BRAND_CONFIG as any).trustSignals?.whatsappClickToChat}: {BRAND_CONFIG.contact.whatsapp}</span>
               </a>
+              <div className="pl-6 flex items-center gap-1">
+                <span className="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded-full bg-whatsapp/10 border border-whatsapp/30 text-[9px] text-whatsapp font-bold">
+                  <svg className="w-2.5 h-2.5 fill-current" viewBox="0 0 20 20">
+                    <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                  </svg>
+                  {(BRAND_CONFIG as any).trustSignals?.verifiedBadgeText}
+                </span>
+              </div>
             </li>
             <li>
               <a

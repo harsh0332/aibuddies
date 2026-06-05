@@ -5,6 +5,7 @@ import { motion } from "framer-motion";
 import { BRAND_CONFIG } from "@/config/content";
 import { scrollToElement } from "@/components/ui/smooth-scroll-provider";
 import ReelCounter from "../ui/reel-counter";
+import Magnetic from "../ui/magnetic";
 
 interface HeroProps {
   is3DActive?: boolean;
@@ -134,26 +135,35 @@ export default function Hero({ is3DActive = false }: HeroProps) {
           {/* Call to Action Buttons */}
           <motion.div 
             variants={itemVariants}
-            className="flex flex-wrap gap-4 mt-4"
+            className="flex flex-col gap-3 mt-4"
           >
-            <a
-              href="#contact"
-              onClick={handleCTAClick}
-              className="inline-flex items-center justify-center px-8 py-4 rounded-full bg-signature text-black font-bold uppercase tracking-wider text-xs md:text-sm border border-signature/80 hover:bg-transparent hover:text-white transition-all duration-300 hover:shadow-[0_0_20px_rgba(43,160,220,0.5)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-signature"
-            >
-              {BRAND_CONFIG.closingCTA.primaryBtn}
-            </a>
+            <div className="flex flex-wrap gap-4 items-center">
+              <Magnetic>
+                <a
+                  href="#contact"
+                  onClick={handleCTAClick}
+                  className="inline-flex items-center justify-center px-8 py-4 rounded-full bg-signature text-black font-extrabold uppercase tracking-wider text-xs md:text-sm border border-signature/80 hover:bg-transparent hover:text-white transition-all duration-300 hover:shadow-[0_0_20px_rgba(43,160,220,0.5)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-signature"
+                >
+                  {BRAND_CONFIG.closingCTA.primaryBtn}
+                </a>
+              </Magnetic>
+              
+              <a
+                href="#process"
+                onClick={(e) => {
+                  e.preventDefault();
+                  scrollToElement("#process");
+                }}
+                className="inline-flex items-center justify-center px-8 py-4 rounded-full border border-border-custom/50 bg-surface-raised/40 backdrop-blur text-white font-extrabold uppercase tracking-wider text-xs md:text-sm hover:border-white transition-all duration-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-signature"
+              >
+                {(BRAND_CONFIG as any).ctaSystem?.secondaryBtnText || "See how it works"}
+              </a>
+            </div>
             
-            <a
-              href="#services"
-              onClick={(e) => {
-                e.preventDefault();
-                scrollToElement("#services");
-              }}
-              className="inline-flex items-center justify-center px-8 py-4 rounded-full border border-border-custom/50 bg-surface-raised/40 backdrop-blur text-white font-bold uppercase tracking-wider text-xs md:text-sm hover:border-white transition-all duration-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-signature"
-            >
-              Explore Solutions
-            </a>
+            {/* Benefit Line */}
+            <p className="text-xs text-text-tertiary/80 font-mono pl-1">
+              {(BRAND_CONFIG as any).ctaSystem?.benefitLine}
+            </p>
           </motion.div>
         </motion.div>
       </div>

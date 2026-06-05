@@ -9,6 +9,7 @@ export default function CustomCursor() {
   const [isEnabled, setIsEnabled] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
   const [isClicked, setIsClicked] = useState(false);
+  const [cursorLabel, setCursorLabel] = useState("");
   
   const mouseRef = useRef({ x: -100, y: -100 });
   const dotPosRef = useRef({ x: -100, y: -100 });
@@ -48,6 +49,14 @@ export default function CustomCursor() {
           hoverStateRef.current = isOverInteractive;
           setIsHovered(isOverInteractive);
         }
+
+        // Handle data-cursor-label
+        const labeledElement = target.closest('[data-cursor-label]');
+        if (labeledElement) {
+          setCursorLabel(labeledElement.getAttribute('data-cursor-label') || "");
+        } else {
+          setCursorLabel("");
+        }
       }
     };
 
@@ -59,6 +68,7 @@ export default function CustomCursor() {
           hoverStateRef.current = false;
           setIsHovered(false);
         }
+        setCursorLabel("");
         return;
       }
       const isOverInteractive = !!target.closest(
@@ -67,6 +77,14 @@ export default function CustomCursor() {
       if (isOverInteractive !== hoverStateRef.current) {
         hoverStateRef.current = isOverInteractive;
         setIsHovered(isOverInteractive);
+      }
+
+      // Handle data-cursor-label
+      const labeledElement = target.closest('[data-cursor-label]');
+      if (labeledElement) {
+        setCursorLabel(labeledElement.getAttribute('data-cursor-label') || "");
+      } else {
+        setCursorLabel("");
       }
     };
 
@@ -135,17 +153,23 @@ export default function CustomCursor() {
       {/* Outer Ring Wrapper: Pure translate3d, no transition, centered in JS */}
       <div
         ref={ringRef}
-        className="pointer-events-none fixed left-0 top-0 z-[998] select-none"
+        className="pointer-events-none fixed left-0 top-0 z-[998] select-none flex items-center justify-center"
         style={{ willChange: "transform" }}
       >
         {/* Visual Ring: Styled and scaled via CSS transitions */}
         <div
-          className={`h-8 w-8 rounded-full border border-signature/60 transition-[transform,background-color,border-color,box-shadow] duration-150 ease-out ${
+          className={`h-8 w-8 rounded-full border border-signature/60 transition-[transform,background-color,border-color,box-shadow] duration-150 ease-out flex items-center justify-center relative ${
             isHovered
               ? "scale-[1.8] border-signature bg-signature/10 shadow-[0_0_15px_rgba(43,160,220,0.4)]"
               : ""
           } ${isClicked ? "scale-[0.6] bg-signature/20" : ""}`}
-        />
+        >
+          {cursorLabel && (
+            <span className="absolute text-[8px] font-extrabold text-white tracking-widest uppercase scale-[0.6] origin-center font-mono select-none">
+              {cursorLabel}
+            </span>
+          )}
+        </div>
       </div>
     </>
   );

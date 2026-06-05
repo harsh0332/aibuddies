@@ -16,7 +16,9 @@ import Services from "@/components/sections/services";
 import Solutions from "@/components/sections/solutions";
 import Process from "@/components/sections/process";
 import Portfolio from "@/components/sections/portfolio";
-import WhyUs from "@/components/sections/why-us";
+import TrustBar from "@/components/sections/trust-bar";
+import ProblemAgitation from "@/components/sections/problem";
+import InlineCTA from "@/components/sections/inline-cta";
 import Testimonials from "@/components/sections/testimonials";
 import FAQ from "@/components/sections/faq";
 import ContactForm from "@/components/sections/contact-form";
@@ -243,9 +245,9 @@ export default function Home() {
             }
           };
 
-          // Trigger 3: Stage 5 -> 5.5: Solutions section fade out
+          // Trigger 3: Stage 5 -> 5.5: TrustBar section fade out
           ScrollTrigger.create({
-            trigger: "#solutions",
+            trigger: "#trust-bar",
             start: "top bottom",
             end: "top 50%",
             scrub: true,
@@ -299,11 +301,6 @@ export default function Home() {
         <main className="w-full block">
           <Hero is3DActive={is3DActive} />
           
-          {/* About section: opaque layer covering fixed canvas */}
-          <div className="relative z-20 bg-surface-base">
-            <About />
-          </div>
-          
           {/* Services section: transparent container for background canvas view */}
           <Services 
             interactive={is3DActive} 
@@ -317,12 +314,16 @@ export default function Home() {
           
           {/* Solutions to CTAs block: opaque layer covering canvas and stacking above services sticky container */}
           <div className="relative z-20 bg-[#020203]">
+            <InlineCTA heading="Ready to automate your workflows and run your business on autopilot?" />
+            <TrustBar />
+            <ProblemAgitation />
+            <About />
             <Solutions />
             <Process />
             <Portfolio />
-            <WhyUs />
-            <Testimonials />
+            <InlineCTA heading="See how much time and revenue you can save with custom AI systems." />
             <FAQ />
+            <Testimonials />
             <ContactForm />
             <FinalCTA />
           </div>

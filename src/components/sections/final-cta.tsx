@@ -5,13 +5,16 @@ import { motion } from "framer-motion";
 import { BRAND_CONFIG } from "@/config/content";
 import CornerBorders from "../ui/corner-borders";
 import { scrollToElement } from "@/components/ui/smooth-scroll-provider";
+import Magnetic from "../ui/magnetic";
 
 export default function FinalCTA() {
   const containerVariants = {
-    hidden: { opacity: 0 },
+    hidden: { opacity: 0, y: 20, filter: "blur(4px)" },
     visible: {
       opacity: 1,
-      transition: { duration: 0.6 },
+      y: 0,
+      filter: "blur(0px)",
+      transition: { duration: 0.45, ease: [0.16, 1, 0.3, 1] as const },
     },
   };
 
@@ -38,7 +41,7 @@ export default function FinalCTA() {
             aria-hidden="true" 
           />
 
-          <CornerBorders className="p-8 md:p-16 text-center bg-surface-raised/40 backdrop-blur-sm glow-border">
+          <CornerBorders className="p-8 md:p-16 text-center glass-card-premium">
             <div className="flex flex-col items-center gap-6 max-w-2xl mx-auto">
               {/* Category tag */}
               <span className="text-[10px] font-mono tracking-[0.25em] text-signature uppercase">
@@ -56,14 +59,33 @@ export default function FinalCTA() {
               </p>
               
               {/* CTA Action button */}
-              <div className="mt-4">
-                <a
-                  href="#contact"
-                  onClick={handleCTAClick}
-                  className="inline-flex items-center justify-center px-8 py-4 rounded-full bg-signature text-black font-extrabold uppercase tracking-wider text-xs md:text-sm border border-signature/80 hover:bg-transparent hover:text-white transition-all duration-300 hover:shadow-[0_0_20px_rgba(43,160,220,0.5)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-signature"
-                >
-                  {BRAND_CONFIG.closingCTA.primaryBtn}
-                </a>
+              <div className="mt-4 flex flex-col gap-3 items-center">
+                <div className="flex flex-wrap gap-4 justify-center">
+                  <Magnetic>
+                    <a
+                      href="#contact"
+                      onClick={handleCTAClick}
+                      className="inline-flex items-center justify-center px-8 py-4 rounded-full bg-signature text-black font-extrabold uppercase tracking-wider text-xs md:text-sm border border-signature/80 hover:bg-transparent hover:text-white transition-all duration-300 hover:shadow-[0_0_20px_rgba(43,160,220,0.5)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-signature"
+                    >
+                      {BRAND_CONFIG.closingCTA.primaryBtn}
+                    </a>
+                  </Magnetic>
+
+                  <a
+                    href="#process"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      scrollToElement("#process");
+                    }}
+                    className="inline-flex items-center justify-center px-8 py-4 rounded-full border border-border-custom/50 bg-surface-raised/40 backdrop-blur text-white font-extrabold uppercase tracking-wider text-xs md:text-sm hover:border-white transition-all duration-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-signature"
+                  >
+                    {(BRAND_CONFIG as any).ctaSystem?.secondaryBtnText || "See how it works"}
+                  </a>
+                </div>
+
+                <p className="text-xs text-text-tertiary/80 font-mono">
+                  {(BRAND_CONFIG as any).ctaSystem?.benefitLine}
+                </p>
               </div>
             </div>
           </CornerBorders>
