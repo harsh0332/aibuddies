@@ -25,16 +25,16 @@ export default function Logo({ className = "", size = "md", variant = "full" }: 
       <div className={`flex items-center gap-3 select-none ${className}`}>
         {/* Monogram Cropped Box */}
         <div 
-          className="relative overflow-hidden mix-blend-screen flex items-center justify-center shrink-0" 
-          style={{ width: 36, height: 36 }}
+          className="relative overflow-hidden mix-blend-screen shrink-0 w-9 h-9"
         >
           <Image
             src={LOGO_IMAGE_PATH}
             alt="AI Buddies Monogram"
-            width={72}
-            height={72}
+            width={80}
+            height={80}
             priority
-            className="max-w-none object-cover object-top scale-[1.7] origin-top"
+            className="absolute max-w-none left-1/2 -translate-x-1/2"
+            style={{ top: "2px" }}
           />
         </div>
         
