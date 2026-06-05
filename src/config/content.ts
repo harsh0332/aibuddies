@@ -217,11 +217,13 @@ export const BRAND_CONFIG = {
     address: "India"
   },
 
-  // EDIT: add real number e.g. businesses automated or % efficiency gained
-  trustStat: {
-    value: "", 
-    label: ""
-  },
+  // Honest deck-derived stats (editable for future scaling)
+  trustStats: [
+    { value: 6, suffix: "+", label: "Businesses Automated" }, // 6 named clients in the deck
+    { value: 5, suffix: "", label: "AI Systems Under One Roof" }, // the 5 core services
+    { value: 24, suffix: "/7", label: "Always-On Monitoring" }, // 24/7 running systems
+    { value: 0, display: "Days", label: "To Launch, Not Months" } // qualitative fallback for rapid deployment
+  ],
 
   problem: {
     eyebrow: "The Cost of Inaction",

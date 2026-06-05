@@ -4,11 +4,25 @@ import React from "react";
 import { motion } from "framer-motion";
 import { BRAND_CONFIG } from "@/config/content";
 import CornerBorders from "../ui/corner-borders";
-import ReelCounter from "../ui/reel-counter";
+import { useCountUp } from "@/hooks/use-count-up";
+
+interface CountUpStatProps {
+  value: number;
+  suffix?: string;
+}
+
+function CountUpStat({ value, suffix = "" }: CountUpStatProps) {
+  const { count, ref } = useCountUp(value);
+  return (
+    <span ref={ref as any}>
+      {count}
+      {suffix}
+    </span>
+  );
+}
 
 export default function TrustBar() {
-  const { clients, trustStat } = BRAND_CONFIG;
-  const hasStat = trustStat && trustStat.value && trustStat.label;
+  const { clients, trustStats } = BRAND_CONFIG;
 
   // Clean / display name mappings for logo-chips
   const displayNames: Record<string, string> = {
@@ -46,33 +60,36 @@ export default function TrustBar() {
           initial="hidden"
           whileInView="visible"
           viewport={{ once: true, margin: "-50px" }}
-          className={`grid items-center gap-8 ${
-            hasStat ? "grid-cols-1 lg:grid-cols-12" : "grid-cols-1"
-          }`}
+          className="grid grid-cols-1 lg:grid-cols-12 gap-10 items-center"
         >
-          {/* Headline Stat Column (If configured) */}
-          {hasStat && (
-            <motion.div
-              variants={itemVariants}
-              className="lg:col-span-4 flex flex-col items-start gap-1 border-l-2 border-signature pl-4"
-            >
-              <span className="font-mono text-3xl md:text-4xl font-extrabold text-white tracking-tight">
-                <ReelCounter value={trustStat.value} />
-              </span>
-              <span className="text-xs uppercase tracking-wider text-text-tertiary font-mono">
-                {trustStat.label}
-              </span>
-            </motion.div>
-          )}
+          {/* Stats Column */}
+          <div className="lg:col-span-5 grid grid-cols-2 md:grid-cols-4 lg:grid-cols-2 xl:grid-cols-4 gap-6">
+            {trustStats && trustStats.map((stat, idx) => (
+              <motion.div
+                key={idx}
+                variants={itemVariants}
+                className="flex flex-col items-start gap-1 border-l-2 border-signature/60 pl-4"
+              >
+                <span className="font-mono text-2xl md:text-3xl lg:text-2xl xl:text-3xl font-extrabold text-white tracking-tight">
+                  {stat.display ? (
+                    <span>{stat.display}</span>
+                  ) : (
+                    <CountUpStat value={stat.value} suffix={stat.suffix} />
+                  )}
+                </span>
+                <span className="text-[10px] uppercase tracking-wider text-text-tertiary font-mono leading-tight">
+                  {stat.label}
+                </span>
+              </motion.div>
+            ))}
+          </div>
 
           {/* Client Logo Grid Column */}
           <motion.div
             variants={itemVariants}
-            className={`w-full flex flex-wrap gap-3 items-center ${
-              hasStat ? "lg:col-span-8 justify-start lg:justify-end" : "justify-center"
-            }`}
+            className="lg:col-span-7 w-full flex flex-col gap-4"
           >
-            <div className={`w-full text-center mb-2 lg:text-left ${!hasStat && "text-center"}`}>
+            <div className="text-center lg:text-left">
               <span className="text-[10px] font-mono tracking-widest text-signature/70 uppercase">
                 Trusted by Forward-Thinking Brands
               </span>
