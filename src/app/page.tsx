@@ -260,9 +260,6 @@ export default function Home() {
         )}
       </AnimatePresence>
 
-      {/* Global background particle canvas */}
-      {!isLoading && <ParticleField is3DActive={is3DActive} />}
-
       {/* Main App Page Content - always rendered in DOM for SEO & LCP */}
       <motion.div
         initial={{ opacity: 0 }}
@@ -270,6 +267,9 @@ export default function Home() {
         transition={{ duration: 0.8, ease: "easeOut" }}
         className="relative z-10 flex flex-col min-h-screen"
       >
+        {/* Global background particle canvas */}
+        {!isLoading && <ParticleField is3DActive={is3DActive} />}
+
         {/* Header sticky navigation */}
         <Navbar />
 

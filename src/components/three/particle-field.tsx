@@ -318,6 +318,7 @@ export default function ParticleField({ is3DActive = false }: ParticleFieldProps
       computeLeftX();
     }
     window.addEventListener("resize", resize);
+    resize();
 
     function onMove(e: PointerEvent) {
       mouse.x = (e.clientX / window.innerWidth) * 2 - 1;
