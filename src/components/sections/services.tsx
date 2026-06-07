@@ -1,7 +1,285 @@
-"use client";
-
 import React, { useRef, useEffect, useState } from "react";
+import * as THREE from "three";
 import { BRAND_CONFIG } from "@/config/content";
+
+const TAU = Math.PI * 2;
+const rnd = (a: number, b: number) => a + Math.random() * (b - a);
+
+function makeBubble(n: number): Float32Array {
+  const a = new Float32Array(n * 3);
+  const W = 1.5, H = 1.05, cr = 0.42;
+  const inRounded = (x: number, y: number) => {
+    const ax = Math.abs(x), ay = Math.abs(y);
+    if (ax <= W - cr || ay <= H - cr) return ax <= W && ay <= H;
+    const dx = ax - (W - cr), dy = ay - (H - cr);
+    return dx * dx + dy * dy <= cr * cr;
+  };
+  for (let i = 0; i < n; i++) {
+    let x, y;
+    if (i % 9 === 0) {
+      const t = Math.random(), s = Math.random() * t;
+      x = -0.55 + (s - t * 0.5) * 0.7;
+      y = -H - t * 0.62 + 0.02;
+    } else {
+      do {
+        x = rnd(-W, W);
+        y = rnd(-H, H);
+      } while (!inRounded(x, y));
+    }
+    a[i * 3] = x;
+    a[i * 3 + 1] = y + 0.18;
+    a[i * 3 + 2] = rnd(-0.1, 0.1);
+  }
+  return a;
+}
+
+function makeHub(n: number): Float32Array {
+  const a = new Float32Array(n * 3);
+  const SAT = 6, R = 1.45;
+  const sat: [number, number][] = [];
+  for (let s = 0; s < SAT; s++) {
+    const ang = (s / SAT) * TAU + 0.3;
+    sat.push([Math.cos(ang) * R, Math.sin(ang) * R]);
+  }
+  for (let i = 0; i < n; i++) {
+    let x, y;
+    const bucket = i % 5;
+    if (bucket === 0) {
+      const a2 = Math.random() * TAU, rr = Math.random() * 0.28;
+      x = Math.cos(a2) * rr;
+      y = Math.sin(a2) * rr;
+    } else if (bucket === 1) {
+      const s = sat[i % SAT];
+      const a2 = Math.random() * TAU, rr = Math.random() * 0.2;
+      x = s[0] + Math.cos(a2) * rr;
+      y = s[1] + Math.sin(a2) * rr;
+    } else {
+      const s = sat[i % SAT];
+      const t = Math.random();
+      x = s[0] * t + (Math.random() - 0.5) * 0.05;
+      y = s[1] * t + (Math.random() - 0.5) * 0.05;
+    }
+    a[i * 3] = x;
+    a[i * 3 + 1] = y;
+    a[i * 3 + 2] = rnd(-0.12, 0.12);
+  }
+  return a;
+}
+
+function makeWaves(n: number): Float32Array {
+  const a = new Float32Array(n * 3);
+  const rings = [0.32, 0.62, 0.92, 1.22, 1.5];
+  for (let i = 0; i < n; i++) {
+    const ri = i % rings.length;
+    const r = rings[ri] + (Math.random() - 0.5) * 0.04;
+    const ang = Math.random() * TAU;
+    a[i * 3] = Math.cos(ang) * r;
+    a[i * 3 + 1] = Math.sin(ang) * r;
+    a[i * 3 + 2] = Math.sin(ang * 6 + ri) * 0.12;
+  }
+  return a;
+}
+
+function makeFunnel(n: number): Float32Array {
+  const a = new Float32Array(n * 3);
+  const top = 1.0, bot = -1.05, rTop = 1.45, rBot = 0.04;
+  for (let i = 0; i < n; i++) {
+    const t = Math.random();
+    const y = top + (bot - top) * t;
+    const r = rTop + (rBot - rTop) * t;
+    const ang = Math.random() * TAU;
+    a[i * 3] = Math.cos(ang) * r;
+    a[i * 3 + 1] = y;
+    a[i * 3 + 2] = Math.sin(ang) * r;
+  }
+  return a;
+}
+
+function makeGear(n: number): Float32Array {
+  const a = new Float32Array(n * 3);
+  const teeth = 9, rOut = 1.45, rIn = 1.12, rHole = 0.42;
+  for (let i = 0; i < n; i++) {
+    const bucket = i % 5;
+    let x, y;
+    if (bucket < 3) {
+      const ang = Math.random() * TAU;
+      const phase = ((ang / TAU) * teeth) % 1;
+      const r = (phase < 0.5 ? rOut : rIn) + (Math.random() - 0.5) * 0.04;
+      x = Math.cos(ang) * r;
+      y = Math.sin(ang) * r;
+    } else if (bucket === 3) {
+      const ang = Math.random() * TAU;
+      const r = rnd(rHole + 0.08, rIn - 0.04);
+      x = Math.cos(ang) * r;
+      y = Math.sin(ang) * r;
+    } else {
+      const ang = Math.random() * TAU;
+      const r = rHole + (Math.random() - 0.5) * 0.05;
+      x = Math.cos(ang) * r;
+      y = Math.sin(ang) * r;
+    }
+    a[i * 3] = x;
+    a[i * 3 + 1] = y;
+    a[i * 3 + 2] = rnd(-0.12, 0.12);
+  }
+  return a;
+}
+
+function ServicesCanvas() {
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+
+    const PARTICLE_COUNT = 2500;
+    const PARTICLE_SIZE = 0.04;
+    const MORPH_LERP = 0.08;
+    const ROTATION_SPEED = 0.0016;
+
+    let renderer: THREE.WebGLRenderer;
+    try {
+      renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true, preserveDrawingBuffer: false });
+    } catch (e) {
+      console.warn("WebGL failed to initialize in services left column:", e);
+      return;
+    }
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+    renderer.setClearColor(0x000000, 0);
+
+    const scene = new THREE.Scene();
+    const camera = new THREE.PerspectiveCamera(50, canvas.clientWidth / canvas.clientHeight, 0.1, 100);
+    camera.position.z = 4.2;
+
+    const shapes = [
+      makeBubble(PARTICLE_COUNT),
+      makeHub(PARTICLE_COUNT),
+      makeWaves(PARTICLE_COUNT),
+      makeFunnel(PARTICLE_COUNT),
+      makeGear(PARTICLE_COUNT),
+    ];
+
+    const current = new Float32Array(shapes[0]);
+    const colors = new Float32Array(PARTICLE_COUNT * 3);
+
+    const C_PART = [67, 194, 216]; // #43C2D8
+    const C_ACC = [43, 160, 220]; // #2BA0DC
+    const lerpVal = (a: number, b: number, t: number) => a + (b - a) * t;
+
+    for (let i = 0; i < PARTICLE_COUNT; i++) {
+      const m = Math.random();
+      colors[i * 3] = lerpVal(C_PART[0], C_ACC[0], m) / 255;
+      colors[i * 3 + 1] = lerpVal(C_PART[1], C_ACC[1], m) / 255;
+      colors[i * 3 + 2] = lerpVal(C_PART[2], C_ACC[2], m) / 255;
+    }
+
+    const geo = new THREE.BufferGeometry();
+    geo.setAttribute("position", new THREE.BufferAttribute(current, 3));
+    geo.setAttribute("color", new THREE.BufferAttribute(colors, 3));
+
+    const c = document.createElement("canvas");
+    c.width = c.height = 64;
+    const g = c.getContext("2d");
+    if (g) {
+      const grad = g.createRadialGradient(32, 32, 0, 32, 32, 32);
+      grad.addColorStop(0, "rgba(255,255,255,1.0)");
+      grad.addColorStop(0.3, "rgba(255,255,255,0.6)");
+      grad.addColorStop(0.5, "rgba(255,255,255,0.0)");
+      grad.addColorStop(1.0, "rgba(255,255,255,0.0)");
+      g.fillStyle = grad;
+      g.fillRect(0, 0, 64, 64);
+    }
+    const sprite = new THREE.CanvasTexture(c);
+
+    const mat = new THREE.PointsMaterial({
+      size: PARTICLE_SIZE,
+      map: sprite,
+      vertexColors: true,
+      transparent: true,
+      opacity: 0.95,
+      depthWrite: false,
+      blending: THREE.AdditiveBlending,
+      sizeAttenuation: true,
+    });
+
+    const points = new THREE.Points(geo, mat);
+    scene.add(points);
+
+    let spinY = 0;
+    let raf = 0;
+    let disposed = false;
+
+    function resize() {
+      if (!canvas) return;
+      const w = canvas.clientWidth;
+      const h = canvas.clientHeight;
+      renderer.setSize(w, h, false);
+      camera.aspect = w / h;
+      camera.updateProjectionMatrix();
+    }
+    resize();
+
+    const resizeObserver = new ResizeObserver(() => resize());
+    resizeObserver.observe(canvas);
+
+    function frame() {
+      if (disposed) return;
+      raf = requestAnimationFrame(frame);
+
+      const wrapEl = document.getElementById("services");
+      const wrapRect = wrapEl ? wrapEl.getBoundingClientRect() : null;
+      const scrollable = wrapRect ? Math.max(1, wrapRect.height - window.innerHeight) : 1;
+      const svcProg = wrapRect ? Math.min(1, Math.max(0, -wrapRect.top / scrollable)) : 0;
+
+      const activeFloat = svcProg * 4;
+      const i0 = Math.floor(activeFloat);
+      const i1 = Math.min(i0 + 1, 4);
+      const f = activeFloat - i0;
+
+      const A = shapes[i0];
+      const B = shapes[i1];
+
+      if (A && B) {
+        const pos = geo.attributes.position.array as Float32Array;
+        for (let i = 0; i < PARTICLE_COUNT; i++) {
+          const k = i * 3;
+          const tx = A[k] + (B[k] - A[k]) * f;
+          const ty = A[k + 1] + (B[k + 1] - A[k + 1]) * f;
+          const tz = A[k + 2] + (B[k + 2] - A[k + 2]) * f;
+
+          pos[k] += (tx - pos[k]) * MORPH_LERP;
+          pos[k + 1] += (ty - pos[k + 1]) * MORPH_LERP;
+          pos[k + 2] += (tz - pos[k + 2]) * MORPH_LERP;
+        }
+        geo.attributes.position.needsUpdate = true;
+      }
+
+      spinY += ROTATION_SPEED;
+      points.rotation.set(0.15, spinY, 0);
+
+      renderer.render(scene, camera);
+    }
+    raf = requestAnimationFrame(frame);
+
+    return () => {
+      disposed = true;
+      cancelAnimationFrame(raf);
+      resizeObserver.disconnect();
+      geo.dispose();
+      mat.dispose();
+      sprite.dispose();
+      renderer.dispose();
+    };
+  }, []);
+
+  return (
+    <canvas
+      ref={canvasRef}
+      className="absolute inset-0 z-0 w-full h-full pointer-events-none"
+      style={{ opacity: 0.95 }}
+    />
+  );
+}
 
 interface ServicesProps {
   interactive?: boolean;
@@ -98,7 +376,7 @@ export default function Services({
     let rafId = 0;
     let disposed = false;
 
-    const CARD_STEP = 468; // 440px card width + 28px gap
+    const CARD_STEP_FALLBACK = 468; // 440px card width + 28px gap
     let trackX = 0;
 
     const loop = () => {
@@ -115,9 +393,10 @@ export default function Services({
       const activeFloat = sp * (5 - 1); // 5 cards total
 
       // Slide the carousel track
+      const cardStep = cardRefs.current[0] ? cardRefs.current[0].clientWidth + 28 : CARD_STEP_FALLBACK;
       const focal = 56;
-      const targetX = focal - activeFloat * CARD_STEP;
-      trackX += (targetX - trackX) * 0.12;
+      const targetX = focal - activeFloat * cardStep;
+      trackX += (targetX - trackX) * 0.15;
       if (trackRef.current) {
         trackRef.current.style.transform = `translate(${trackX}px, -50%)`;
       }
@@ -290,8 +569,10 @@ export default function Services({
       >
         <div className="flex h-full w-full">
           {/* Left Column */}
-          <div className="relative w-[44%] md:w-1/2 h-full flex flex-col justify-between py-24 pl-12 pr-6 z-10 select-none">
-            <div className="pt-8 max-w-sm">
+          <div className="relative w-[44%] md:w-1/2 h-full flex flex-col justify-between py-24 pl-12 pr-6 z-10 select-none overflow-hidden">
+            <ServicesCanvas />
+            
+            <div className="relative z-10 pt-8 max-w-sm">
               <div className="text-xs font-semibold tracking-[0.3em] text-[#43C2D8] uppercase font-mono">
                 What We Build
               </div>
@@ -303,7 +584,7 @@ export default function Services({
               </p>
             </div>
             
-            <div className="flex items-center gap-5 pb-4">
+            <div className="relative z-10 flex items-center gap-5 pb-4">
               <div
                 ref={counterRef}
                 className="tabular-nums text-[20px] font-semibold text-[#f6f6fd]/40 tracking-[0.1em] font-mono"
