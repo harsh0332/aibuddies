@@ -6,7 +6,7 @@ import * as THREE from "three";
 /* ---- TWEAK KNOBS ---------------------------------------------------------- */
 const PARTICLE_COUNT = 4000;
 const SPHERE_RADIUS = 1.4;
-const PARTICLE_SIZE = 0.045;
+const PARTICLE_SIZE = 0.022;
 const REPEL_RADIUS = 0.9;
 const REPEL_FORCE = 0.55;
 const RETURN_LERP = 0.10;
@@ -197,9 +197,10 @@ function makeSprite(): THREE.CanvasTexture {
   const g = c.getContext("2d");
   if (g) {
     const grad = g.createRadialGradient(32, 32, 0, 32, 32, 32);
-    grad.addColorStop(0, "rgba(255,255,255,1)");
-    grad.addColorStop(0.35, "rgba(255,255,255,0.6)");
-    grad.addColorStop(1, "rgba(255,255,255,0)");
+    grad.addColorStop(0, "rgba(255,255,255,1.0)");
+    grad.addColorStop(0.3, "rgba(255,255,255,0.6)");
+    grad.addColorStop(0.5, "rgba(255,255,255,0.0)");
+    grad.addColorStop(1.0, "rgba(255,255,255,0.0)");
     g.fillStyle = grad;
     g.fillRect(0, 0, 64, 64);
   }
@@ -226,13 +227,14 @@ export default function ParticleField({ is3DActive = false }: ParticleFieldProps
 
     let renderer: THREE.WebGLRenderer;
     try {
-      renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true, preserveDrawingBuffer: true });
+      renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true, preserveDrawingBuffer: false });
     } catch (e) {
       console.warn("WebGL initialization failed, falling back to static background:", e);
       setIsStatic(true);
       return;
     }
     renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+    renderer.setClearColor(0x000000, 0);
 
     const scene = new THREE.Scene();
     const camera = new THREE.PerspectiveCamera(50, window.innerWidth / window.innerHeight, 0.1, 100);
@@ -409,7 +411,7 @@ export default function ParticleField({ is3DActive = false }: ParticleFieldProps
       points.rotation.set(tiltX, spinY + tiltY, 0);
       points.position.x += (lerp(0, leftXWorld, enter) - points.position.x) * 0.08;
 
-      const introGlobe = easeOut(clamp((performance.now() - introStart - 420) / 900, 0, 1)); // delay 420ms, duration 900ms
+      const introGlobe = easeOut(clamp((performance.now() - introStart - 200) / 600, 0, 1)); // delay 200ms, duration 600ms
       points.scale.setScalar(lerp(0.9, 1, introGlobe));
       mat.opacity = 0.95 * vis * introGlobe;
 
