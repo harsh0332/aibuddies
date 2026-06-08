@@ -6,11 +6,11 @@ import * as THREE from "three";
 /* ---- TWEAK KNOBS ---------------------------------------------------------- */
 const PARTICLE_COUNT = 4000;
 const SPHERE_RADIUS = 1.4;
-const PARTICLE_SIZE = 0.022;
+const PARTICLE_SIZE = 0.045;
 const REPEL_RADIUS = 0.9;
 const REPEL_FORCE = 0.55;
 const RETURN_LERP = 0.10;
-const MORPH_LERP = 0.08;
+const MORPH_LERP = 0.14;
 const ROTATION_SPEED = 0.0016;
 const LEFT_FRACTION = 0.26;
 
@@ -68,6 +68,11 @@ function makeBubble(n: number): Float32Array {
     a[i * 3 + 1] = y + 0.18;
     a[i * 3 + 2] = rnd(-0.1, 0.1);
   }
+  // Bounding radius is ~1.93. Scale to 1.4.
+  const scale = 1.4 / 1.93;
+  for (let i = 0; i < n * 3; i++) {
+    a[i] *= scale;
+  }
   return a;
 }
 
@@ -102,6 +107,11 @@ function makeHub(n: number): Float32Array {
     a[i * 3 + 1] = y;
     a[i * 3 + 2] = rnd(-0.12, 0.12);
   }
+  // Bounding radius is ~1.65. Scale to 1.4.
+  const scale = 1.4 / 1.65;
+  for (let i = 0; i < n * 3; i++) {
+    a[i] *= scale;
+  }
   return a;
 }
 
@@ -116,6 +126,11 @@ function makeWaves(n: number): Float32Array {
     a[i * 3] = Math.cos(ang) * r;
     a[i * 3 + 1] = Math.sin(ang) * r;
     a[i * 3 + 2] = Math.sin(ang * 6 + ri) * 0.12;
+  }
+  // Bounding radius is ~1.52. Scale to 1.4.
+  const scale = 1.4 / 1.52;
+  for (let i = 0; i < n * 3; i++) {
+    a[i] *= scale;
   }
   return a;
 }
@@ -132,6 +147,11 @@ function makeFunnel(n: number): Float32Array {
     a[i * 3] = Math.cos(ang) * r;
     a[i * 3 + 1] = y;
     a[i * 3 + 2] = Math.sin(ang) * r;
+  }
+  // Bounding radius is ~1.76. Scale to 1.4.
+  const scale = 1.4 / 1.76;
+  for (let i = 0; i < n * 3; i++) {
+    a[i] *= scale;
   }
   return a;
 }
@@ -163,6 +183,11 @@ function makeGear(n: number): Float32Array {
     a[i * 3] = x;
     a[i * 3 + 1] = y;
     a[i * 3 + 2] = rnd(-0.12, 0.12);
+  }
+  // Bounding radius is ~1.47. Scale to 1.4.
+  const scale = 1.4 / 1.47;
+  for (let i = 0; i < n * 3; i++) {
+    a[i] *= scale;
   }
   return a;
 }
@@ -197,10 +222,9 @@ function makeSprite(): THREE.CanvasTexture {
   const g = c.getContext("2d");
   if (g) {
     const grad = g.createRadialGradient(32, 32, 0, 32, 32, 32);
-    grad.addColorStop(0, "rgba(255,255,255,1.0)");
-    grad.addColorStop(0.3, "rgba(255,255,255,0.6)");
-    grad.addColorStop(0.5, "rgba(255,255,255,0.0)");
-    grad.addColorStop(1.0, "rgba(255,255,255,0.0)");
+    grad.addColorStop(0,    "rgba(255,255,255,1.0)");
+    grad.addColorStop(0.35, "rgba(255,255,255,0.6)");
+    grad.addColorStop(1.0,  "rgba(255,255,255,0.0)");
     g.fillStyle = grad;
     g.fillRect(0, 0, 64, 64);
   }
@@ -412,7 +436,7 @@ export default function ParticleField({ is3DActive = false }: ParticleFieldProps
       points.rotation.set(tiltX, spinY + tiltY, 0);
       points.position.x += (lerp(0, leftXWorld, enter) - points.position.x) * 0.08;
 
-      const introGlobe = easeOut(clamp((performance.now() - introStart - 200) / 600, 0, 1)); // delay 200ms, duration 600ms
+      const introGlobe = easeOut(clamp((performance.now() - introStart - 420) / 900, 0, 1)); // delay 420ms, duration 900ms
       points.scale.setScalar(lerp(0.9, 1, introGlobe));
       mat.opacity = 0.95 * vis * introGlobe;
 

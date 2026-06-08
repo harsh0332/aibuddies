@@ -413,7 +413,7 @@ export default function Services({
       >
         <div className="flex h-full w-full">
           {/* Left Column */}
-          <div className="relative w-[44%] md:w-1/2 h-full flex flex-col justify-between py-24 pl-12 pr-6 z-10 select-none overflow-hidden">
+          <div className="relative w-[44%] md:w-1/2 h-full flex flex-col justify-between py-24 pl-12 pr-6 select-none">
             
             <div className="relative z-10 pt-8 max-w-sm">
               <div className="text-xs font-semibold tracking-[0.3em] text-[#43C2D8] uppercase font-mono">
