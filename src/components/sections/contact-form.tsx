@@ -39,7 +39,7 @@ export default function ContactForm() {
   const emailId = useId();
 
   // Read the booking URL from environment variables
-  const bookingUrl = process.env.NEXT_PUBLIC_BOOKING_URL || "";
+  const bookingUrl = process.env.NEXT_PUBLIC_BOOKING_URL || "https://cal.com/ai-buddies/30min";
 
   // Set screen-reader announcements on step changes
   useEffect(() => {

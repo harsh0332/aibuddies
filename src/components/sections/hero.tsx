@@ -102,8 +102,9 @@ export default function Hero({ is3DActive = false }: HeroProps) {
         </p>
 
         <a
-          href="#contact"
-          onClick={handleCTAClick}
+          href="https://cal.com/ai-buddies/30min"
+          target="_blank"
+          rel="noopener noreferrer"
           className="relative mx-auto flex w-fit items-center gap-2 mt-8 text-sm font-semibold text-[#021018] px-6 py-3 rounded-full bg-[#43C2D8] shadow-[0_0_10px_0_rgba(43,160,220,0.55)] transition-transform hover:scale-[1.03]"
         >
           Book a Free Call
@@ -213,8 +214,9 @@ export default function Hero({ is3DActive = false }: HeroProps) {
             </p>
             <Magnetic>
               <a
-                href="#contact"
-                onClick={handleCTAClick}
+                href="https://cal.com/ai-buddies/30min"
+                target="_blank"
+                rel="noopener noreferrer"
                 className="inline-flex w-fit items-center gap-2 whitespace-nowrap transition-transform hover:scale-[1.03] mt-5 text-sm font-semibold text-[#021018] px-6 py-3 rounded-full bg-[#43C2D8] shadow-[0_0_10px_0_rgba(43,160,220,0.55)] focus:outline-none focus:ring-2 focus:ring-[#f6f6fd]"
               >
                 Book a Free Call

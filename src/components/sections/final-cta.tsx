@@ -63,8 +63,9 @@ export default function FinalCTA() {
                 <div className="flex flex-wrap gap-4 justify-center">
                   <Magnetic>
                     <a
-                      href="#contact"
-                      onClick={handleCTAClick}
+                      href="https://cal.com/ai-buddies/30min"
+                      target="_blank"
+                      rel="noopener noreferrer"
                       className="inline-flex items-center justify-center px-8 py-4 rounded-full bg-signature text-black font-extrabold uppercase tracking-wider text-xs md:text-sm border border-signature/80 hover:bg-transparent hover:text-white transition-all duration-300 hover:shadow-[0_0_20px_rgba(43,160,220,0.5)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-signature"
                     >
                       {BRAND_CONFIG.closingCTA.primaryBtn}

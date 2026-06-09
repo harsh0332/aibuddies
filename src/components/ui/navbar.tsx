@@ -77,8 +77,9 @@ export default function Navbar() {
         <div className="hidden md:block">
           <Magnetic>
             <a
-              href="#contact"
-              onClick={(e) => handleLinkClick(e, "#contact")}
+              href="https://cal.com/ai-buddies/30min"
+              target="_blank"
+              rel="noopener noreferrer"
               className="inline-flex items-center justify-center px-5 py-2 text-xs font-semibold uppercase tracking-wider rounded-full bg-signature text-black border border-signature/80 hover:bg-transparent hover:text-white transition-all duration-300 hover:shadow-[0_0_15px_rgba(43,160,220,0.4)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-signature"
             >
               {BRAND_CONFIG.closingCTA.primaryBtn}
@@ -115,8 +116,9 @@ export default function Navbar() {
             ))}
             <li className="mt-4 pt-4 border-t border-border-custom/50">
               <a
-                href="#contact"
-                onClick={(e) => handleLinkClick(e, "#contact")}
+                href="https://cal.com/ai-buddies/30min"
+                target="_blank"
+                rel="noopener noreferrer"
                 className="block w-full py-3 text-center text-sm font-semibold uppercase tracking-wider rounded-full bg-signature text-black hover:bg-transparent hover:text-white border border-signature hover:border-white transition-all duration-300"
               >
                 {BRAND_CONFIG.closingCTA.primaryBtn}
