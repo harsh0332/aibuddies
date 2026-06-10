@@ -76,6 +76,26 @@ export default function Hero({ is3DActive = false }: HeroProps) {
           aria-hidden="true"
         />
 
+        {/* Mobile-only animated backdrop (hidden on desktop, disabled on reduced-motion) */}
+        <div className="mobile-hero-bg absolute inset-0 pointer-events-none z-0 overflow-hidden" aria-hidden="true">
+          <div className="mobile-orb mobile-orb-1" />
+          <div className="mobile-orb mobile-orb-2" />
+          <div className="mobile-twinkles">
+            <div className="twinkle-dot" style={{ top: "15%", left: "20%" }} />
+            <div className="twinkle-dot" style={{ top: "25%", left: "80%" }} />
+            <div className="twinkle-dot" style={{ top: "45%", left: "15%" }} />
+            <div className="twinkle-dot" style={{ top: "35%", left: "70%" }} />
+            <div className="twinkle-dot" style={{ top: "60%", left: "85%" }} />
+            <div className="twinkle-dot" style={{ top: "70%", left: "25%" }} />
+            <div className="twinkle-dot" style={{ top: "80%", left: "75%" }} />
+            <div className="twinkle-dot" style={{ top: "50%", left: "50%" }} />
+            <div className="twinkle-dot" style={{ top: "10%", left: "60%" }} />
+            <div className="twinkle-dot" style={{ top: "90%", left: "40%" }} />
+            <div className="twinkle-dot" style={{ top: "65%", left: "65%" }} />
+            <div className="twinkle-dot" style={{ top: "30%", left: "45%" }} />
+          </div>
+        </div>
+
         {/* glowing orb stand-in */}
         <div className="relative mx-auto h-44 w-44 mt-8" aria-hidden="true">
           <div
