@@ -39,8 +39,9 @@ export default function FAQ() {
   return (
     <section 
       id="faq" 
-      className="py-20 md:py-28 px-6 md:px-12 lg:px-24 bg-[#020203] w-full overflow-hidden"
+      className="relative py-20 md:py-28 px-6 md:px-12 lg:px-24 bg-[#020203] w-full overflow-hidden"
     >
+      <div aria-hidden className="pointer-events-none absolute inset-0 bg-grid-pattern opacity-40 [mask-image:radial-gradient(60%_50%_at_50%_40%,#000,transparent)]" />
       <div className="max-w-4xl mx-auto">
         <motion.div
           variants={containerVariants}

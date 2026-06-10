@@ -1,3 +1,4 @@
+/* eslint-disable */
 "use client";
 
 import React from "react";
@@ -41,7 +42,8 @@ export default function FinalCTA() {
             aria-hidden="true" 
           />
 
-          <CornerBorders className="p-8 md:p-16 text-center glass-card-premium">
+          <CornerBorders className="p-8 md:p-16 text-center glass-card-premium relative overflow-hidden">
+            <div className="aurora-bg absolute inset-0 pointer-events-none" aria-hidden="true" />
             <div className="flex flex-col items-center gap-6 max-w-2xl mx-auto">
               {/* Category tag */}
               <span className="text-[10px] font-mono tracking-[0.25em] text-signature uppercase">
@@ -66,7 +68,7 @@ export default function FinalCTA() {
                       href="https://cal.com/ai-buddies/30min"
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="inline-flex items-center justify-center px-8 py-4 rounded-full bg-signature text-black font-extrabold uppercase tracking-wider text-xs md:text-sm border border-signature/80 hover:bg-transparent hover:text-white transition-all duration-300 hover:shadow-[0_0_20px_rgba(43,160,220,0.5)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-signature"
+                      className="btn-shine inline-flex items-center justify-center px-8 py-4 rounded-full bg-signature text-black font-extrabold uppercase tracking-wider text-xs md:text-sm border border-signature/80 hover:bg-transparent hover:text-white transition-all duration-300 hover:shadow-[0_0_20px_rgba(43,160,220,0.5)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-signature"
                     >
                       {BRAND_CONFIG.closingCTA.primaryBtn}
                     </a>

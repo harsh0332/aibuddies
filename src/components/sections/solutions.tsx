@@ -2,6 +2,7 @@
 
 import React, { useState } from "react";
 import { motion } from "framer-motion";
+import AmbientOrbs from "../ui/ambient";
 import { BRAND_CONFIG } from "@/config/content";
 import CornerBorders from "../ui/corner-borders";
 import { Layers, CheckCircle2 } from "lucide-react";
@@ -42,8 +43,9 @@ export default function Solutions() {
   return (
     <section 
       id="solutions" 
-      className="py-20 md:py-28 px-6 md:px-12 lg:px-24 bg-surface-base w-full overflow-hidden"
+      className="relative py-20 md:py-28 px-6 md:px-12 lg:px-24 bg-surface-base w-full overflow-hidden"
     >
+      <AmbientOrbs />
       <div className="max-w-6xl mx-auto">
         <motion.div
           variants={containerVariants}

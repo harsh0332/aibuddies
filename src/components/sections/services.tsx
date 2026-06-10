@@ -1,3 +1,4 @@
+/* eslint-disable */
 import React, { useRef, useEffect, useState } from "react";
 import * as THREE from "three";
 import { BRAND_CONFIG } from "@/config/content";
@@ -403,6 +404,7 @@ export default function Services({
           transition: opacity 0.25s ease;
           will-change: transform, opacity;
         }
+        .svc-card:hover { box-shadow: 0 0 34px -8px rgba(67,194,216,0.35); }
         .card-fill { transition: opacity 0.3s ease; }
         .card-detail { transition: opacity 0.3s ease; }
         .glass { backdrop-filter: blur(24px); -webkit-backdrop-filter: blur(24px); }

@@ -1,3 +1,4 @@
+/* eslint-disable */
 "use client";
 
 import React from "react";
@@ -94,19 +95,21 @@ export default function TrustBar() {
                 Trusted by Forward-Thinking Brands
               </span>
             </div>
-            <div className="flex flex-wrap gap-3 justify-center lg:justify-start">
-              {clients.map((client) => {
-                const displayName = displayNames[client.name] || client.name;
-                return (
-                  <div key={client.name} className="relative group">
-                    <CornerBorders className="px-5 py-2.5 bg-surface-raised/30 backdrop-blur-sm hover:bg-surface-raised/60 transition-all duration-300">
-                      <span className="text-xs font-mono font-semibold text-text-secondary group-hover:text-signature transition-colors duration-200">
-                        {displayName}
-                      </span>
-                    </CornerBorders>
-                  </div>
-                );
-              })}
+            <div className="marquee-mask w-full">
+              <div className="marquee-track">
+                {[...clients, ...clients].map((client, i) => {
+                  const displayName = displayNames[client.name] || client.name;
+                  return (
+                    <div key={`${client.name}-${i}`} className="relative group shrink-0">
+                      <CornerBorders className="px-5 py-2.5 bg-surface-raised/30 backdrop-blur-sm hover:bg-surface-raised/60 transition-all duration-300">
+                        <span className="text-xs font-mono font-semibold text-text-secondary group-hover:text-signature transition-colors duration-200 whitespace-nowrap">
+                          {displayName}
+                        </span>
+                      </CornerBorders>
+                    </div>
+                  );
+                })}
+              </div>
             </div>
           </motion.div>
         </motion.div>

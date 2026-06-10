@@ -4,6 +4,7 @@ import React from "react";
 import { motion } from "framer-motion";
 import { BRAND_CONFIG } from "@/config/content";
 import CornerBorders from "../ui/corner-borders";
+import Tilt from "../ui/tilt";
 import { Zap, Clock, ShieldCheck, TrendingUp, Cpu } from "lucide-react";
 import { scrollToElement } from "@/components/ui/smooth-scroll-provider";
 
@@ -74,6 +75,11 @@ export default function WhyUs() {
               <h2 className="text-3xl md:text-5xl font-extrabold tracking-tight text-white font-sora leading-tight">
                 Why Choose Us?
               </h2>
+            <motion.div
+              aria-hidden
+              variants={{ hidden: { width: 0 }, visible: { width: 64, transition: { duration: 1, ease: [0.16, 1, 0.3, 1] as const, delay: 0.3 } } }}
+              className="h-0.5 bg-gradient-to-r from-signature to-transparent rounded-full"
+            />
             </div>
             
             <p className="text-sm md:text-base text-text-tertiary leading-relaxed">
@@ -87,7 +93,7 @@ export default function WhyUs() {
                   e.preventDefault();
                   scrollToElement("#contact");
                 }}
-                className="inline-flex items-center justify-center px-6 py-3.5 rounded-full bg-signature text-black font-semibold text-xs uppercase tracking-wider border border-signature/80 hover:bg-transparent hover:text-white transition-all duration-300"
+                className="btn-shine inline-flex items-center justify-center px-6 py-3.5 rounded-full bg-signature text-black font-semibold text-xs uppercase tracking-wider border border-signature/80 hover:bg-transparent hover:text-white transition-all duration-300"
               >
                 Schedule Consultation
               </a>
@@ -105,6 +111,7 @@ export default function WhyUs() {
                 variants={revealVariants}
                 className={`group ${index === 4 ? "md:col-span-2" : ""}`}
               >
+                <Tilt className="h-full rounded-[12px]">
                 <CornerBorders className="h-full p-8 glass-card-premium hover:-translate-y-1.5">
                   <div className="flex flex-col gap-4">
                     {/* Header: Icon */}
@@ -123,6 +130,7 @@ export default function WhyUs() {
                     </p>
                   </div>
                 </CornerBorders>
+                </Tilt>
               </motion.div>
             ))}
           </motion.div>

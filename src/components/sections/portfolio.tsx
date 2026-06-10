@@ -4,6 +4,7 @@ import React from "react";
 import { motion } from "framer-motion";
 import { BRAND_CONFIG } from "@/config/content";
 import CornerBorders from "../ui/corner-borders";
+import Tilt from "../ui/tilt";
 import { Briefcase, ArrowUpRight } from "lucide-react";
 
 export default function Portfolio() {
@@ -51,6 +52,11 @@ export default function Portfolio() {
             <h2 className="text-3xl md:text-5xl font-extrabold tracking-tight text-white font-sora">
               Case Studies & Portfolio
             </h2>
+            <motion.div
+              aria-hidden
+              variants={{ hidden: { width: 0 }, visible: { width: 64, transition: { duration: 1, ease: [0.16, 1, 0.3, 1] as const, delay: 0.3 } } }}
+              className="h-0.5 bg-gradient-to-r from-signature to-transparent rounded-full"
+            />
             <p className="text-base text-text-tertiary leading-relaxed">
               We deploy automated business systems across clinics, media companies, marketing agencies, and hosting firms. Real infrastructure powering active operations.
             </p>
@@ -68,6 +74,7 @@ export default function Portfolio() {
                 className="group"
                 data-cursor-label="View"
               >
+                <Tilt className="h-full rounded-[12px]">
                 <CornerBorders className="h-full p-8 glass-card-premium hover:-translate-y-1.5 flex flex-col justify-between">
                   <div className="flex flex-col gap-6">
                     {/* Header: Service Badge */}
@@ -94,6 +101,7 @@ export default function Portfolio() {
                     DEPLOYMENT // COMPILED
                   </div>
                 </CornerBorders>
+                </Tilt>
               </motion.div>
             ))}
           </motion.div>

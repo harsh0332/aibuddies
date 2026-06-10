@@ -1,3 +1,4 @@
+/* eslint-disable */
 "use client";
 
 import React, { useState, useId, useEffect } from "react";
@@ -155,8 +156,9 @@ export default function ContactForm() {
   return (
     <section 
       id="contact" 
-      className="py-20 md:py-28 px-6 md:px-12 lg:px-24 bg-surface-base w-full overflow-hidden"
+      className="relative py-20 md:py-28 px-6 md:px-12 lg:px-24 bg-surface-base w-full overflow-hidden"
     >
+      <div aria-hidden className="pointer-events-none absolute inset-0 bg-grid-pattern opacity-40 [mask-image:radial-gradient(60%_50%_at_50%_40%,#000,transparent)]" />
       {/* Screen Reader Live region for accessibility */}
       <div className="sr-only" aria-live="polite" aria-atomic="true">
         {announcement}

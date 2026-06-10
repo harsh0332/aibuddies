@@ -80,7 +80,7 @@ export default function Navbar() {
               href="https://cal.com/ai-buddies/30min"
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center justify-center px-5 py-2 text-xs font-semibold uppercase tracking-wider rounded-full bg-signature text-black border border-signature/80 hover:bg-transparent hover:text-white transition-all duration-300 hover:shadow-[0_0_15px_rgba(43,160,220,0.4)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-signature"
+              className="btn-shine inline-flex items-center justify-center px-5 py-2 text-xs font-semibold uppercase tracking-wider rounded-full bg-signature text-black border border-signature/80 hover:bg-transparent hover:text-white transition-all duration-300 hover:shadow-[0_0_15px_rgba(43,160,220,0.4)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-signature"
             >
               {BRAND_CONFIG.closingCTA.primaryBtn}
             </a>

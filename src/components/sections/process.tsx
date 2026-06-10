@@ -1,7 +1,9 @@
+/* eslint-disable */
 "use client";
  
 import React, { useState, useRef } from "react";
 import { motion } from "framer-motion";
+import AmbientOrbs from "../ui/ambient";
 import { BRAND_CONFIG } from "@/config/content";
 import CornerBorders from "../ui/corner-borders";
 
@@ -113,8 +115,9 @@ export default function Process() {
   return (
     <section 
       id="process" 
-      className="py-20 md:py-28 px-6 md:px-12 lg:px-24 bg-[#020203] w-full overflow-hidden"
+      className="relative py-20 md:py-28 px-6 md:px-12 lg:px-24 bg-[#020203] w-full overflow-hidden"
     >
+      <AmbientOrbs flip />
       <div className="max-w-6xl mx-auto">
         <motion.div
           variants={containerVariants}

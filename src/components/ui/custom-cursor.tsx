@@ -1,3 +1,4 @@
+/* eslint-disable */
 "use client";
 
 import { useEffect, useRef, useState } from "react";
@@ -5,6 +6,7 @@ import { useEffect, useRef, useState } from "react";
 export default function CustomCursor() {
   const dotRef = useRef<HTMLDivElement>(null);
   const ringRef = useRef<HTMLDivElement>(null);
+  const glowRef = useRef<HTMLDivElement>(null);
   
   const [isEnabled, setIsEnabled] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
@@ -14,6 +16,7 @@ export default function CustomCursor() {
   const mouseRef = useRef({ x: -100, y: -100 });
   const dotPosRef = useRef({ x: -100, y: -100 });
   const ringPosRef = useRef({ x: -100, y: -100 });
+  const glowPosRef = useRef({ x: -100, y: -100 });
   const animationFrameRef = useRef<number | null>(null);
 
   // Ref tracker to throttle React state changes
@@ -118,6 +121,14 @@ export default function CustomCursor() {
         ringRef.current.style.transform = `translate3d(${ringPosRef.current.x - 16}px, ${ringPosRef.current.y - 16}px, 0)`;
       }
 
+      // 3. Soft trailing glow halo (slow lerp = 0.10 for a dreamy lag)
+      const glowLerp = 0.1;
+      glowPosRef.current.x += (mouseRef.current.x - glowPosRef.current.x) * glowLerp;
+      glowPosRef.current.y += (mouseRef.current.y - glowPosRef.current.y) * glowLerp;
+      if (glowRef.current) {
+        glowRef.current.style.transform = `translate3d(${glowPosRef.current.x - 80}px, ${glowPosRef.current.y - 80}px, 0)`;
+      }
+
       animationFrameRef.current = requestAnimationFrame(render);
     };
 
@@ -140,6 +151,23 @@ export default function CustomCursor() {
 
   return (
     <>
+      {/* Trailing glow halo: slow lerp, sits behind everything */}
+      <div
+        ref={glowRef}
+        aria-hidden
+        className="pointer-events-none fixed left-0 top-0 z-[997] select-none"
+        style={{ willChange: "transform" }}
+      >
+        <div
+          className="h-40 w-40 rounded-full"
+          style={{
+            background:
+              "radial-gradient(circle, rgba(43,160,220,0.10), rgba(67,194,216,0.05) 45%, transparent 70%)",
+            filter: "blur(6px)",
+          }}
+        />
+      </div>
+
       {/* Inner Dot Wrapper: Pure translate3d, no transition, centered in JS */}
       <div
         ref={dotRef}

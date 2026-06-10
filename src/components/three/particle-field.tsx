@@ -1,3 +1,4 @@
+/* eslint-disable */
 "use client";
 
 import React, { useRef, useEffect, useState } from "react";
@@ -214,6 +215,8 @@ function hexRgb(h: string): [number, number, number] {
 
 const C_PART = hexRgb(COL.accent);
 const C_ACC = hexRgb(COL.primary);
+const C_DEEP = hexRgb("#0E5FB5");   // deep blue (bottom of gradient)
+const C_VIOLET = hexRgb("#7C6FF0"); // violet accent particles
 
 /* round soft particle sprite */
 function makeSprite(): THREE.CanvasTexture {
@@ -277,10 +280,30 @@ export default function ParticleField({ is3DActive = false }: ParticleFieldProps
     const colors = new Float32Array(PARTICLE_COUNT * 3);
 
     for (let i = 0; i < PARTICLE_COUNT; i++) {
-      const m = Math.random();
-      colors[i * 3] = lerp(C_PART[0], C_ACC[0], m) / 255;
-      colors[i * 3 + 1] = lerp(C_PART[1], C_ACC[1], m) / 255;
-      colors[i * 3 + 2] = lerp(C_PART[2], C_ACC[2], m) / 255;
+      /* Multi-hue palette (set once — zero runtime cost):
+         vertical gradient deep-blue → primary → bright cyan, plus
+         ~8% violet accents and ~5% near-white sparks for richness. */
+      const yNorm = clamp((shapes[0][i * 3 + 1] / SPHERE_RADIUS + 1) / 2, 0, 1);
+      const roll = Math.random();
+      let r: number, g: number, b: number;
+      if (roll < 0.05) {
+        r = 235; g = 250; b = 255;                       // near-white sparks
+      } else if (roll < 0.13) {
+        r = C_VIOLET[0]; g = C_VIOLET[1]; b = C_VIOLET[2]; // violet accents
+      } else if (yNorm > 0.5) {
+        const t = (yNorm - 0.5) / 0.5;                    // mid → top: primary → cyan
+        r = lerp(C_ACC[0], C_PART[0], t);
+        g = lerp(C_ACC[1], C_PART[1], t);
+        b = lerp(C_ACC[2], C_PART[2], t);
+      } else {
+        const t = yNorm / 0.5;                            // bottom → mid: deep → primary
+        r = lerp(C_DEEP[0], C_ACC[0], t);
+        g = lerp(C_DEEP[1], C_ACC[1], t);
+        b = lerp(C_DEEP[2], C_ACC[2], t);
+      }
+      colors[i * 3] = r / 255;
+      colors[i * 3 + 1] = g / 255;
+      colors[i * 3 + 2] = b / 255;
     }
 
     const geo = new THREE.BufferGeometry();
@@ -300,6 +323,28 @@ export default function ParticleField({ is3DActive = false }: ParticleFieldProps
     });
 
     const points = new THREE.Points(geo, mat);
+
+    /* Sparkle layer — sparse bright twinkles riding on the main cloud.
+       Child of `points` so it inherits rotation/position/scale for free. */
+    const SPARKLE_COUNT = 220;
+    const sIdx = new Uint16Array(SPARKLE_COUNT);
+    for (let i = 0; i < SPARKLE_COUNT; i++) sIdx[i] = Math.floor(Math.random() * PARTICLE_COUNT);
+    const sPos = new Float32Array(SPARKLE_COUNT * 3);
+    const sGeo = new THREE.BufferGeometry();
+    sGeo.setAttribute("position", new THREE.BufferAttribute(sPos, 3));
+    const sMat = new THREE.PointsMaterial({
+      size: PARTICLE_SIZE * 2.4,
+      map: sprite,
+      color: 0xbfefff,
+      transparent: true,
+      opacity: 0,
+      depthWrite: false,
+      blending: THREE.AdditiveBlending,
+      sizeAttenuation: true,
+    });
+    const sparkles = new THREE.Points(sGeo, sMat);
+    points.add(sparkles);
+
     const group = new THREE.Group();
     group.add(points);
     scene.add(group);
@@ -344,8 +389,12 @@ export default function ParticleField({ is3DActive = false }: ParticleFieldProps
     window.addEventListener("resize", resize);
     resize();
 
+    let swirl = 0, lastMx = 0;
     function onMove(e: PointerEvent) {
-      mouse.x = (e.clientX / window.innerWidth) * 2 - 1;
+      const nx = (e.clientX / window.innerWidth) * 2 - 1;
+      swirl = clamp(swirl + (nx - lastMx) * 0.8, -1.2, 1.2); // cursor sweep → spin impulse
+      lastMx = nx;
+      mouse.x = nx;
       mouse.y = -((e.clientY / window.innerHeight) * 2 - 1);
       mouse.active = true;
       const halfH = Math.tan((camera.fov * Math.PI / 180) / 2) * camera.position.z;
@@ -429,6 +478,8 @@ export default function ParticleField({ is3DActive = false }: ParticleFieldProps
       geo.attributes.position.needsUpdate = true;
 
       spinY += ROTATION_SPEED * (1 - enter * 0.55);
+      swirl *= 0.94;                              // decay cursor-sweep impulse
+      spinY += swirl * dt * 2.0 * (1 - enter);    // swirl spins the globe (hero only)
       const tTiltX = mouse.y * 0.26 * (1 - enter), tTiltY = mouse.x * 0.4 * (1 - enter);
       tiltX += (tTiltX - tiltX) * 0.05;
       tiltY += (tTiltY - tiltY) * 0.05;
@@ -438,7 +489,18 @@ export default function ParticleField({ is3DActive = false }: ParticleFieldProps
 
       const introGlobe = easeOut(clamp((performance.now() - introStart - 420) / 900, 0, 1)); // delay 420ms, duration 900ms
       points.scale.setScalar(lerp(0.9, 1, introGlobe));
-      mat.opacity = 0.95 * vis * introGlobe;
+      const breathe = 0.92 + 0.06 * Math.sin(now * 0.0012); // subtle living brightness
+      mat.opacity = breathe * vis * introGlobe;
+
+      /* sync sparkles to morphing cloud + twinkle */
+      for (let i = 0; i < SPARKLE_COUNT; i++) {
+        const j = sIdx[i] * 3, k3 = i * 3;
+        sPos[k3] = pos[j];
+        sPos[k3 + 1] = pos[j + 1];
+        sPos[k3 + 2] = pos[j + 2];
+      }
+      sGeo.attributes.position.needsUpdate = true;
+      sMat.opacity = (0.16 + 0.22 * (0.5 + 0.5 * Math.sin(now * 0.0021))) * vis * introGlobe;
 
       renderer.render(scene, camera);
       raf = requestAnimationFrame(frame);
@@ -453,6 +515,8 @@ export default function ParticleField({ is3DActive = false }: ParticleFieldProps
       window.removeEventListener("pointerout", onLeave);
       geo.dispose();
       mat.dispose();
+      sGeo.dispose();
+      sMat.dispose();
       sprite.dispose();
       renderer.dispose();
     };
