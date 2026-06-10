@@ -1,4 +1,3 @@
-/* eslint-disable */
 "use client";
 
 import React, { useRef, useEffect, useState } from "react";
@@ -218,6 +217,33 @@ const C_ACC = hexRgb(COL.primary);
 const C_DEEP = hexRgb("#0E5FB5");   // deep blue (bottom of gradient)
 const C_VIOLET = hexRgb("#7C6FF0"); // violet accent particles
 
+/* Per-service stage tints — each morph shape gets its own hue.
+   Pastel (mixed 50% with white) so multiplying vertexColors keeps brightness. */
+const STAGE_TINTS: [number, number, number][] = [
+  [1, 1, 1],                   // 0 sphere (hero) — neutral
+  [0.78, 0.95, 1.0],           // 1 AI Chatbots — cyan
+  [0.66, 0.95, 0.78],          // 2 WhatsApp — green
+  [0.80, 0.76, 1.0],           // 3 Voice Agents — violet
+  [1.0, 0.88, 0.64],           // 4 Lead Qualification — amber
+  [1.0, 0.72, 0.78],           // 5 AI Support — rose
+];
+
+/* Orbital ring positions (planet feel): tilted circles around the sphere */
+function makeRing(n: number, radius: number, tiltX: number, tiltZ: number): Float32Array {
+  const a = new Float32Array(n * 3);
+  const cx = Math.cos(tiltX), sx = Math.sin(tiltX);
+  const cz = Math.cos(tiltZ), sz = Math.sin(tiltZ);
+  for (let i = 0; i < n; i++) {
+    const t = (i / n) * TAU;
+    let x = Math.cos(t) * radius, y = 0, z = Math.sin(t) * radius;
+    // tilt around X then Z
+    let y1 = y * cx - z * sx, z1 = y * sx + z * cx;
+    let x2 = x * cz - y1 * sz, y2 = x * sz + y1 * cz;
+    a[i * 3] = x2; a[i * 3 + 1] = y2; a[i * 3 + 2] = z1;
+  }
+  return a;
+}
+
 /* round soft particle sprite */
 function makeSprite(): THREE.CanvasTexture {
   const c = document.createElement("canvas");
@@ -344,6 +370,25 @@ export default function ParticleField({ is3DActive = false }: ParticleFieldProps
     });
     const sparkles = new THREE.Points(sGeo, sMat);
     points.add(sparkles);
+
+    /* Orbital rings — "global network" planet feel (hero only, fade out on services) */
+    const RING_N = 320;
+    const ringGeoA = new THREE.BufferGeometry();
+    ringGeoA.setAttribute("position", new THREE.BufferAttribute(makeRing(RING_N, SPHERE_RADIUS * 1.45, 0.42, 0.18), 3));
+    const ringGeoB = new THREE.BufferGeometry();
+    ringGeoB.setAttribute("position", new THREE.BufferAttribute(makeRing(RING_N, SPHERE_RADIUS * 1.72, -0.30, -0.5), 3));
+    const ringMatA = new THREE.PointsMaterial({
+      size: PARTICLE_SIZE * 0.8, map: sprite, color: 0x43c2d8, transparent: true,
+      opacity: 0, depthWrite: false, blending: THREE.AdditiveBlending, sizeAttenuation: true,
+    });
+    const ringMatB = new THREE.PointsMaterial({
+      size: PARTICLE_SIZE * 0.7, map: sprite, color: 0x8b7cf6, transparent: true,
+      opacity: 0, depthWrite: false, blending: THREE.AdditiveBlending, sizeAttenuation: true,
+    });
+    const ringA = new THREE.Points(ringGeoA, ringMatA);
+    const ringB = new THREE.Points(ringGeoB, ringMatB);
+    points.add(ringA);
+    points.add(ringB);
 
     const group = new THREE.Group();
     group.add(points);
@@ -502,6 +547,26 @@ export default function ParticleField({ is3DActive = false }: ParticleFieldProps
       sGeo.attributes.position.needsUpdate = true;
       sMat.opacity = (0.16 + 0.22 * (0.5 + 0.5 * Math.sin(now * 0.0021))) * vis * introGlobe;
 
+      /* Orbit rings: counter-rotate, visible in hero, fade as services enter */
+      ringA.rotation.y += dt * 0.22;
+      ringB.rotation.y -= dt * 0.16;
+      const ringVis = (1 - enter) * vis * introGlobe;
+      ringMatA.opacity = 0.55 * ringVis;
+      ringMatB.opacity = 0.40 * ringVis;
+
+      /* Per-service hue tint: blend material color toward the active stage tint */
+      const tA = STAGE_TINTS[Math.min(i0 + 1, 5)] || STAGE_TINTS[0];
+      const tB = STAGE_TINTS[Math.min(i1 + 1, 5)] || STAGE_TINTS[0];
+      const heroMix = 1 - enter; // in hero → neutral white
+      const tr = lerp(lerp(tA[0], tB[0], f), 1, heroMix);
+      const tg = lerp(lerp(tA[1], tB[1], f), 1, heroMix);
+      const tb2 = lerp(lerp(tA[2], tB[2], f), 1, heroMix);
+      mat.color.setRGB(
+        mat.color.r + (tr - mat.color.r) * 0.06,
+        mat.color.g + (tg - mat.color.g) * 0.06,
+        mat.color.b + (tb2 - mat.color.b) * 0.06
+      );
+
       renderer.render(scene, camera);
       raf = requestAnimationFrame(frame);
     }
@@ -517,6 +582,10 @@ export default function ParticleField({ is3DActive = false }: ParticleFieldProps
       mat.dispose();
       sGeo.dispose();
       sMat.dispose();
+      ringGeoA.dispose();
+      ringGeoB.dispose();
+      ringMatA.dispose();
+      ringMatB.dispose();
       sprite.dispose();
       renderer.dispose();
     };

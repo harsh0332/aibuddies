@@ -115,9 +115,10 @@ export default function Solutions() {
                   
                   {/* Dynamic background glow */}
                   <div 
-                    className="absolute w-44 h-44 rounded-full bg-signature/20 blur-[60px] pointer-events-none" 
-                    aria-hidden="true" 
+                    className="absolute w-44 h-44 rounded-full bg-signature/20 blur-[60px] pointer-events-none"
+                    aria-hidden="true"
                   />
+                  <div className="radar-sweep absolute w-64 h-64 opacity-70" aria-hidden="true" />
 
                   {/* Connected Network Diagram */}
                   <svg 

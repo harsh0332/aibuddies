@@ -1,4 +1,3 @@
-/* eslint-disable */
 "use client";
 
 import React, { useState, useId, useEffect } from "react";
@@ -212,6 +211,7 @@ export default function ContactForm() {
 
           {/* Right: Multi-Step Qualifier Panel */}
           <div className="lg:col-span-7 w-full">
+            <div className="border-spin rounded-[16px]">
             <CornerBorders className="p-8 bg-surface-raised/40 backdrop-blur-sm glow-border">
               
               {status === "success" ? (
@@ -501,6 +501,7 @@ export default function ContactForm() {
                 </div>
               )}
             </CornerBorders>
+            </div>
           </div>
 
         </div>

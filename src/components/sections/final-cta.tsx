@@ -1,4 +1,3 @@
-/* eslint-disable */
 "use client";
 
 import React from "react";
@@ -52,7 +51,7 @@ export default function FinalCTA() {
               
               {/* Closing Heading */}
               <h2 className="text-3xl md:text-5xl font-extrabold tracking-tight text-white font-sora leading-tight">
-                {BRAND_CONFIG.closingCTA.heading}
+                <span className="text-shimmer">{BRAND_CONFIG.closingCTA.heading}</span>
               </h2>
               
               {/* Closing Subheading */}

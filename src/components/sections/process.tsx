@@ -1,4 +1,3 @@
-/* eslint-disable */
 "use client";
  
 import React, { useState, useRef } from "react";
@@ -150,8 +149,9 @@ export default function Process() {
             {/* Progress line driven by GSAP ScrollTrigger for desktop */}
             <div 
               id="process-progress-line"
-              className="hidden lg:block absolute top-[40px] left-[5%] h-[1px] bg-signature origin-left scale-x-0 -z-10" 
-              style={{ width: "90%" }}
+              className="hidden lg:block absolute top-[40px] left-[5%] h-[2px] origin-left scale-x-0 -z-10"
+              data-multicolor="true" 
+              style={{ width: "90%", background: "linear-gradient(90deg, #43C2D8, #34D399 35%, #8B7CF6 70%, #F5B544)" }}
               aria-hidden="true"
             />
 

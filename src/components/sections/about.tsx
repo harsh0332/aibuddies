@@ -77,7 +77,7 @@ export default function About() {
                 variants={revealVariants}
                 className="group"
               >
-                <CornerBorders className="h-full p-8 glass-card-premium hover:-translate-y-1.5">
+                <CornerBorders className={`h-full p-8 glass-card-premium hover:-translate-y-1.5 float-${(index % 3) + 1}`}>
                   <div className="flex flex-col gap-4">
                     {/* Step Count */}
                     <div className="font-mono text-xs text-signature/50 font-bold">

@@ -1,4 +1,3 @@
-/* eslint-disable */
 "use client";
 
 import React from "react";
@@ -55,6 +54,7 @@ export default function TrustBar() {
 
   return (
     <section id="trust-bar" className="relative z-20 w-full py-12 border-y border-border-custom/40 bg-[#020203] px-6 md:px-12 lg:px-24">
+      <div aria-hidden className="energy-line absolute top-0 left-0 right-0" />
       <div className="max-w-6xl mx-auto">
         <motion.div
           variants={containerVariants}
@@ -91,7 +91,8 @@ export default function TrustBar() {
             className="lg:col-span-7 w-full flex flex-col gap-4"
           >
             <div className="text-center lg:text-left">
-              <span className="text-[10px] font-mono tracking-widest text-signature/70 uppercase">
+              <span className="inline-flex items-center gap-2 text-[10px] font-mono tracking-widest text-signature/70 uppercase">
+                <span className="live-dot" aria-hidden />
                 Trusted by Forward-Thinking Brands
               </span>
             </div>

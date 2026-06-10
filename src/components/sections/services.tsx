@@ -1,4 +1,3 @@
-/* eslint-disable */
 import React, { useRef, useEffect, useState } from "react";
 import * as THREE from "three";
 import { BRAND_CONFIG } from "@/config/content";
@@ -141,6 +140,16 @@ const SERVICE_DETAILS = [
 ];
 
 const POWERED = ["n8n", "WhatsApp API", "LLMs", "Webhooks"];
+
+
+/* Per-service accent hues — colorful global-brand system (matches particle STAGE_TINTS) */
+const SERVICE_HUES = [
+  { main: "#43C2D8", deep: "#0E5FB5" }, // 01 AI Chatbots — cyan
+  { main: "#34D399", deep: "#0B7A53" }, // 02 WhatsApp — green
+  { main: "#8B7CF6", deep: "#5746C9" }, // 03 Voice Agents — violet
+  { main: "#F5B544", deep: "#B97A14" }, // 04 Lead Qualification — amber
+  { main: "#FB7185", deep: "#C2425C" }, // 05 AI Support — rose
+];
 
 function StaticIcon({ shape }: { shape: string }) {
   const s = {
@@ -336,7 +345,7 @@ export default function Services({
           </h2>
 
           <div className="flex flex-col mt-8 gap-6">
-            {servicesData.map((s) => (
+            {servicesData.map((s, i) => (
               <div
                 key={s.n}
                 style={{
@@ -347,7 +356,7 @@ export default function Services({
                 }}
               >
                 <div className="flex items-center justify-between">
-                  <span className="tabular-nums font-bold text-[#43C2D8] text-4xl leading-none">
+                  <span className="tabular-nums font-bold text-4xl leading-none" style={{ color: SERVICE_HUES[i].main }}>
                     {s.n}
                   </span>
                   <StaticIcon shape={s.shape} />
@@ -465,23 +474,24 @@ export default function Services({
                     height: "64vh",
                     maxHeight: 560,
                     borderRadius: 24,
-                    border: "1px solid rgba(43,160,220,0.18)",
+                    border: `1px solid ${SERVICE_HUES[i].main}2E`,
                     background: "linear-gradient(180deg, rgba(8,12,18,0.55), rgba(2,2,2,0.5))"
                   }}
                 >
                   {/* active card fill gradient */}
                   <div
                     className="card-fill pointer-events-none absolute inset-0 opacity-0 transition-opacity duration-300"
-                    style={{ background: "linear-gradient(165deg, #2BA0DC 0%, #0E5FB5 78%)" }}
+                    style={{ background: `linear-gradient(165deg, ${SERVICE_HUES[i].main} 0%, ${SERVICE_HUES[i].deep} 82%)` }}
                   />
                   {/* active top border light indicator */}
                   <div
-                    className="card-fill pointer-events-none absolute inset-x-0 top-0 h-[3px] opacity-0 transition-opacity duration-300 bg-[#43C2D8]"
+                    className="card-fill pointer-events-none absolute inset-x-0 top-0 h-[3px] opacity-0 transition-opacity duration-300"
+                    style={{ background: SERVICE_HUES[i].main }}
                   />
 
                   <div className="relative h-full flex flex-col p-10 justify-between select-none">
                     <div className="flex items-start justify-between">
-                      <span className="card-num tabular-nums text-[56px] font-bold leading-none text-[#43C2D8]">
+                      <span className="card-num tabular-nums text-[56px] font-bold leading-none" style={{ color: SERVICE_HUES[i].main }}>
                         {s.n}
                       </span>
                       <span className="card-arrow grid place-items-center h-11 w-11 rounded-full border border-[rgba(67,194,216,0.35)] transition-all duration-300">

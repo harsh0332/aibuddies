@@ -59,7 +59,7 @@ export default function Testimonials() {
             <CornerBorders className="p-8 md:p-12 glass-card-premium min-h-[260px] flex flex-col justify-between relative overflow-hidden">
               
               {/* Background Quote SVG */}
-              <Quote className="absolute right-8 top-8 h-28 w-28 text-signature/5 pointer-events-none" />
+              <Quote className="absolute right-8 top-8 h-28 w-28 text-signature/5 pointer-events-none float-2" />
 
               <div className="relative z-10" aria-live="polite" id="testimonial-content-region">
                 {/* Testimonial Quote */}

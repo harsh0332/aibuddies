@@ -194,3 +194,117 @@ body {
   .float-orb { display: none; }
   .marquee-track { width: 100%; flex-wrap: wrap; transform: none !important; }
 }
+
+/* ============================================================
+   V3 — GLOBAL-COMPANY ANIMATION SYSTEM
+   Per-section accent hues · shimmer text · rotating borders
+   energy lines · float bobs · radar sweep · orbit dots
+   ============================================================ */
+
+@theme {
+  --color-hue-cyan: #43C2D8;
+  --color-hue-green: #34D399;
+  --color-hue-violet: #8B7CF6;
+  --color-hue-amber: #F5B544;
+  --color-hue-rose: #FB7185;
+}
+
+/* Animated gradient shimmer text (key headings) */
+.text-shimmer {
+  background: linear-gradient(110deg, #43C2D8 20%, #8B7CF6 40%, #34D399 60%, #43C2D8 80%);
+  background-size: 250% 100%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  animation: shimmer-pan 6s linear infinite;
+}
+@keyframes shimmer-pan { to { background-position: -250% 0; } }
+
+/* Rotating conic gradient border (premium panels) */
+@property --spin-angle { syntax: "<angle>"; initial-value: 0deg; inherits: false; }
+.border-spin { position: relative; border-radius: 16px; }
+.border-spin::before {
+  content: ""; position: absolute; inset: -1px; border-radius: inherit; padding: 1px;
+  background: conic-gradient(from var(--spin-angle),
+    rgba(67,194,216,0.0) 0%, rgba(67,194,216,0.7) 12%, rgba(139,124,246,0.55) 25%,
+    rgba(67,194,216,0.0) 40%, rgba(67,194,216,0.0) 60%,
+    rgba(52,211,153,0.45) 75%, rgba(67,194,216,0.0) 92%);
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor; mask-composite: exclude;
+  animation: spin-angle 5s linear infinite;
+  pointer-events: none;
+}
+@keyframes spin-angle { to { --spin-angle: 360deg; } }
+
+/* Travelling energy line (section dividers) */
+.energy-line { position: relative; height: 1px; overflow: hidden; background: rgba(36,36,40,0.5); }
+.energy-line::after {
+  content: ""; position: absolute; top: 0; left: -30%; height: 100%; width: 30%;
+  background: linear-gradient(90deg, transparent, #43C2D8, #8B7CF6, transparent);
+  animation: energy-travel 4s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+}
+@keyframes energy-travel { to { left: 130%; } }
+
+/* Gentle levitation bobs (3 phases) */
+@keyframes float-bob {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-10px); }
+}
+.float-1 { animation: float-bob 6s ease-in-out infinite; }
+.float-2 { animation: float-bob 7s ease-in-out 0.8s infinite; }
+.float-3 { animation: float-bob 8s ease-in-out 1.6s infinite; }
+
+/* Radar sweep (solutions hub) */
+.radar-sweep { position: absolute; inset: 0; border-radius: 9999px; overflow: hidden; pointer-events: none; }
+.radar-sweep::before {
+  content: ""; position: absolute; inset: 0;
+  background: conic-gradient(from 0deg, transparent 0%, rgba(67,194,216,0.18) 12%, transparent 25%);
+  animation: radar-rotate 5s linear infinite;
+}
+@keyframes radar-rotate { to { transform: rotate(360deg); } }
+
+/* Pulsing ping ring (icons / live dots) */
+.ping-ring { position: relative; }
+.ping-ring::after {
+  content: ""; position: absolute; inset: 0; border-radius: inherit;
+  border: 1px solid rgba(67,194,216,0.5);
+  animation: ping-out 2.4s cubic-bezier(0, 0, 0.2, 1) infinite;
+}
+@keyframes ping-out { 75%, 100% { transform: scale(1.7); opacity: 0; } }
+
+/* Diagonal hazard stripes (problem section, very subtle) */
+.diag-stripes {
+  background-image: repeating-linear-gradient(-45deg,
+    rgba(239,68,68,0.04) 0 2px, transparent 2px 14px);
+  animation: stripes-slide 22s linear infinite;
+}
+@keyframes stripes-slide { to { background-position: 200px 0; } }
+
+/* Live status dot */
+.live-dot { position: relative; width: 7px; height: 7px; border-radius: 9999px; background: #34D399; }
+.live-dot::after {
+  content: ""; position: absolute; inset: 0; border-radius: inherit; background: #34D399;
+  animation: ping-out 1.8s cubic-bezier(0, 0, 0.2, 1) infinite;
+}
+
+/* Footer link underline slide */
+.link-slide { position: relative; }
+.link-slide::after {
+  content: ""; position: absolute; left: 0; bottom: -2px; height: 1px; width: 0%;
+  background: linear-gradient(90deg, #43C2D8, #8B7CF6);
+  transition: width 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.link-slide:hover::after { width: 100%; }
+
+/* V3 reduced-motion / touch guards */
+@media (pointer: coarse), (prefers-reduced-motion: reduce) {
+  .text-shimmer { animation: none; background-position: 0 0; }
+  .border-spin::before, .energy-line::after, .radar-sweep::before,
+  .ping-ring::after, .live-dot::after, .diag-stripes,
+  .float-1, .float-2, .float-3 { animation: none !important; }
+}
+
+/* FAQ accordion hover nudge */
+#faq button { transition: transform 0.3s cubic-bezier(0.16,1,0.3,1); }
+#faq button:hover { transform: translateX(6px); }
+@media (pointer: coarse), (prefers-reduced-motion: reduce) { #faq button:hover { transform: none; } }

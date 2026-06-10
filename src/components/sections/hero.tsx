@@ -94,7 +94,7 @@ export default function Hero({ is3DActive = false }: HeroProps) {
         </div>
 
         <h1 className="relative text-center mt-12 text-4xl md:text-5xl font-light tracking-tight text-[#f6f6fd] leading-tight max-w-2xl font-sora">
-          We build <span className="text-[#43C2D8] italic font-bold">AI systems</span> that run your business.
+          We build <span className="text-shimmer italic font-bold">AI systems</span> that run your business.
         </h1>
         
         <p className="relative text-center mt-6 text-base md:text-lg text-[#f6f6fd]/60 max-w-xl leading-relaxed">

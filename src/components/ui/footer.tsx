@@ -13,7 +13,8 @@ export default function Footer() {
   };
 
   return (
-    <footer className="w-full bg-surface-base border-t border-border-custom/30 py-12 md:py-20 px-6 md:px-12 relative overflow-hidden">
+    <footer className="relative w-full bg-surface-base border-t border-border-custom/30 py-12 md:py-20 px-6 md:px-12 relative overflow-hidden">
+      <div aria-hidden className="energy-line absolute top-0 left-0 right-0" />
       {/* Background Subtle Gradient Glow */}
       <div 
         className="absolute -bottom-48 left-1/2 -translate-x-1/2 w-96 h-96 rounded-full bg-signature/10 blur-[120px] pointer-events-none select-none"
