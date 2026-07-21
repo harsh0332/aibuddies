@@ -24,7 +24,7 @@ export default function Footer() {
       <div className="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-4 gap-10 relative z-10">
         {/* Brand Section */}
         <div className="flex flex-col gap-4 md:col-span-2">
-          <Logo size="md" />
+          <Logo size="md" variant="full" />
           <p className="text-xs tracking-wider text-text-tertiary uppercase font-mono mt-1">
             {BRAND_CONFIG.categoryLine}
           </p>
