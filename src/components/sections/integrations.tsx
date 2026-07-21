@@ -33,7 +33,7 @@ interface WorkflowStep {
 
 interface IntegrationTool {
   name: string;
-  icon: React.ElementType;
+  icon: any;
 }
 
 interface WorkflowData {
@@ -326,7 +326,7 @@ export default function Integrations() {
 
                     <div className="flex flex-wrap gap-2.5">
                       {activeWorkflow.tools.map((tool, idx) => {
-                        const Icon = tool.icon;
+                        const Icon = tool.icon as any;
                         return (
                           <motion.div
                             key={tool.name}
