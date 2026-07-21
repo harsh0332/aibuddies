@@ -1,5 +1,13 @@
 @import "tailwindcss";
 
+:root {
+  --font-jakarta: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+}
+
+:root {
+  --font-jakarta: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+}
+
 @theme {
   --color-background: #000000;
   --color-foreground: #ffffff;

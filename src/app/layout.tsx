@@ -1,15 +1,12 @@
 import type { Metadata } from "next";
-import { Plus_Jakarta_Sans } from "next/font/google";
 import CustomCursor from "@/components/ui/custom-cursor";
 import SmoothScrollProvider from "@/components/ui/smooth-scroll-provider";
 import { BRAND_CONFIG } from "@/config/content";
 import "./globals.css";
 
-const plusJakartaSans = Plus_Jakarta_Sans({
+const plusJakartaSans = {
   variable: "--font-jakarta",
-  subsets: ["latin"],
-  weight: ["300", "400", "500", "600", "700", "800"],
-});
+};
 
 export const metadata: Metadata = {
   title: `${BRAND_CONFIG.name} | AI Automation Agency`,

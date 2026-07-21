@@ -14,6 +14,7 @@ import Hero from "@/components/sections/hero";
 import About from "@/components/sections/about";
 import Services from "@/components/sections/services";
 import Solutions from "@/components/sections/solutions";
+import Integrations from "@/components/sections/integrations";
 import Process from "@/components/sections/process";
 import Portfolio from "@/components/sections/portfolio";
 import TrustBar from "@/components/sections/trust-bar";
@@ -295,6 +296,7 @@ export default function Home() {
             <ProblemAgitation />
             <About />
             <Solutions />
+            <Integrations />
             <Process />
             <Portfolio />
             <WhyUs />
