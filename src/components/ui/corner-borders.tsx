@@ -1,7 +1,7 @@
 import React from "react";
 
 interface CornerBordersProps {
-  children: React.ReactNode;
+  children?: React.ReactNode;
   className?: string;
   showCorners?: boolean;
 }
