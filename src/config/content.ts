@@ -3,6 +3,7 @@
 
 export const BRAND_CONFIG = {
   name: "AI Buddies",
+  ctaLink: "https://cal.com/ai-buddies/30min",
   categoryLine: "Agents · Automations · AI Skills",
   primaryTagline: "We build AI systems that run your business — so you don't have to.",
   positioning: "We don't just build AI tools — we build systems that run your business while you sleep. From clinics to media companies, marketing agencies to coaching firms, we help businesses stop doing things manually and start running on AI.",

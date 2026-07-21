@@ -383,7 +383,7 @@ export default function Integrations() {
                   </p>
 
                   <a
-                    href={BRAND_CONFIG.ctaLink}
+                    href="https://cal.com/ai-buddies/30min"
                     target="_blank"
                     rel="noopener noreferrer"
                     className="mt-2 inline-flex items-center gap-2 text-xs font-medium text-signature hover:text-signature-bright group transition-colors"
@@ -511,7 +511,7 @@ export default function Integrations() {
             </div>
 
             <a
-              href={BRAND_CONFIG.ctaLink}
+              href="https://cal.com/ai-buddies/30min"
               target="_blank"
               rel="noopener noreferrer"
               className="px-6 py-3 rounded-full bg-signature text-black font-semibold text-sm hover:bg-signature-bright transition-all shadow-[0_0_25px_rgba(43,160,220,0.4)] hover:shadow-[0_0_35px_rgba(43,160,220,0.6)] whitespace-nowrap flex items-center gap-2"
