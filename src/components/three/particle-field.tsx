@@ -535,10 +535,12 @@ export default function ParticleField({ is3DActive = false }: ParticleFieldProps
       points.rotation.set(tiltX, spinY + tiltY, 0);
       
       const targetPosX = isMobile ? 0 : lerp(0, leftXWorld, enter);
+      const targetPosY = isMobile ? -0.10 : 0;
       points.position.x += (targetPosX - points.position.x) * 0.08;
+      points.position.y += (targetPosY - points.position.y) * 0.08;
 
       const introGlobe = easeOut(clamp((performance.now() - introStart - 420) / 900, 0, 1)); // delay 420ms, duration 900ms
-      const baseScale = isMobile ? 0.48 : lerp(0.9, 1, introGlobe);
+      const baseScale = isMobile ? 0.44 : lerp(0.9, 1, introGlobe);
       
       // 100% perfectly round 3D globe (equal X, Y, Z scaling)
       points.scale.setScalar(baseScale);
