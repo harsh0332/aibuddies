@@ -522,7 +522,9 @@ export default function ParticleField({ is3DActive = false }: ParticleFieldProps
       }
       geo.attributes.position.needsUpdate = true;
 
-      spinY += ROTATION_SPEED * (1 - enter * 0.55);
+      const isMobile = window.innerWidth < 768;
+
+      spinY += ROTATION_SPEED * (isMobile ? 1.4 : (1 - enter * 0.55));
       swirl *= 0.94;                              // decay cursor-sweep impulse
       spinY += swirl * dt * 2.0 * (1 - enter);    // swirl spins the globe (hero only)
       const tTiltX = mouse.y * 0.26 * (1 - enter), tTiltY = mouse.x * 0.4 * (1 - enter);
@@ -530,12 +532,18 @@ export default function ParticleField({ is3DActive = false }: ParticleFieldProps
       tiltY += (tTiltY - tiltY) * 0.05;
 
       points.rotation.set(tiltX, spinY + tiltY, 0);
-      points.position.x += (lerp(0, leftXWorld, enter) - points.position.x) * 0.08;
+      
+      const targetPosX = isMobile ? 0 : lerp(0, leftXWorld, enter);
+      points.position.x += (targetPosX - points.position.x) * 0.08;
 
       const introGlobe = easeOut(clamp((performance.now() - introStart - 420) / 900, 0, 1)); // delay 420ms, duration 900ms
-      points.scale.setScalar(lerp(0.9, 1, introGlobe));
+      const baseScale = isMobile ? 0.60 : lerp(0.9, 1, introGlobe);
+      points.scale.setScalar(baseScale);
       const breathe = 0.92 + 0.06 * Math.sin(now * 0.0012); // subtle living brightness
-      mat.opacity = breathe * vis * introGlobe;
+
+      // On mobile, fade out particle cloud smoothly when scrolling past Hero section into Services
+      const mobileVis = isMobile ? clamp(1 - heroProg * 1.5, 0, 1) : vis;
+      mat.opacity = breathe * mobileVis * introGlobe;
 
       /* sync sparkles to morphing cloud + twinkle */
       for (let i = 0; i < SPARKLE_COUNT; i++) {
@@ -545,12 +553,12 @@ export default function ParticleField({ is3DActive = false }: ParticleFieldProps
         sPos[k3 + 2] = pos[j + 2];
       }
       sGeo.attributes.position.needsUpdate = true;
-      sMat.opacity = (0.16 + 0.22 * (0.5 + 0.5 * Math.sin(now * 0.0021))) * vis * introGlobe;
+      sMat.opacity = (0.16 + 0.22 * (0.5 + 0.5 * Math.sin(now * 0.0021))) * mobileVis * introGlobe;
 
       /* Orbit rings: counter-rotate, visible in hero, fade as services enter */
       ringA.rotation.y += dt * 0.22;
       ringB.rotation.y -= dt * 0.16;
-      const ringVis = (1 - enter) * vis * introGlobe;
+      const ringVis = (1 - (isMobile ? heroProg * 1.5 : enter)) * mobileVis * introGlobe;
       ringMatA.opacity = 0.55 * ringVis;
       ringMatB.opacity = 0.40 * ringVis;
 

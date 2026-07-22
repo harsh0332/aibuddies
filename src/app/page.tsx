@@ -34,6 +34,7 @@ const ParticleField = dynamic(() => import("@/components/three/particle-field"),
 export default function Home() {
   const [isLoading, setIsLoading] = useState(true);
   const [is3DActive, setIs3DActive] = useState(false);
+  const [isDesktop3D, setIsDesktop3D] = useState(false);
   const [activeIndex, setActiveIndex] = useState(0);
 
   // Auto-scroll to top on initial mounting / refresh
@@ -44,13 +45,15 @@ export default function Home() {
     }
   }, []);
 
-  // Detect 3D compatibility on client side (desktop non-touch with preferred motion and min-width 1024px)
+  // Detect 3D compatibility
   useEffect(() => {
     if (typeof window === "undefined") return;
 
     const check3DCompatibility = () => {
       const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+      const isLargeScreen = window.innerWidth >= 1024;
       setIs3DActive(!prefersReducedMotion);
+      setIsDesktop3D(isLargeScreen && !prefersReducedMotion);
     };
 
     check3DCompatibility();
@@ -276,10 +279,10 @@ export default function Home() {
           
           {/* Services section: transparent container for background canvas view */}
           <Services 
-            interactive={is3DActive} 
+            interactive={isDesktop3D} 
             activeIndex={activeIndex} 
             onCardClick={(index) => {
-              if (is3DActive && (window as any).scrollToService) {
+              if (isDesktop3D && (window as any).scrollToService) {
                 (window as any).scrollToService(index);
               }
             }}
