@@ -252,8 +252,9 @@ function makeSprite(): THREE.CanvasTexture {
   if (g) {
     const grad = g.createRadialGradient(32, 32, 0, 32, 32, 32);
     grad.addColorStop(0,    "rgba(255,255,255,1.0)");
-    grad.addColorStop(0.35, "rgba(255,255,255,0.6)");
-    grad.addColorStop(1.0,  "rgba(255,255,255,0.0)");
+    grad.addColorStop(0.25, "rgba(235,250,255,0.95)");
+    grad.addColorStop(0.50, "rgba(67,194,216,0.55)");
+    grad.addColorStop(1.0,  "rgba(0,0,0,0.0)");
     g.fillStyle = grad;
     g.fillRect(0, 0, 64, 64);
   }
@@ -537,17 +538,12 @@ export default function ParticleField({ is3DActive = false }: ParticleFieldProps
       points.position.x += (targetPosX - points.position.x) * 0.08;
 
       const introGlobe = easeOut(clamp((performance.now() - introStart - 420) / 900, 0, 1)); // delay 420ms, duration 900ms
-      const baseScale = isMobile ? 0.85 : lerp(0.9, 1, introGlobe);
+      const baseScale = isMobile ? 0.48 : lerp(0.9, 1, introGlobe);
       
-      // Aspect ratio correction: ensure 100% perfectly round 3D sphere on mobile portrait screens
-      const aspect = window.innerWidth / window.innerHeight;
-      if (aspect < 1) {
-        points.scale.set(baseScale * aspect, baseScale, baseScale);
-      } else {
-        points.scale.setScalar(baseScale);
-      }
+      // 100% perfectly round 3D globe (equal X, Y, Z scaling)
+      points.scale.setScalar(baseScale);
 
-      const breathe = 0.92 + 0.06 * Math.sin(now * 0.0012); // subtle living brightness
+      const breathe = 0.94 + 0.06 * Math.sin(now * 0.0016); // living brightness
 
       // On mobile, fade out particle cloud smoothly when scrolling past Hero section into Services
       const mobileVis = isMobile ? clamp(1 - heroProg * 1.5, 0, 1) : vis;
@@ -561,14 +557,14 @@ export default function ParticleField({ is3DActive = false }: ParticleFieldProps
         sPos[k3 + 2] = pos[j + 2];
       }
       sGeo.attributes.position.needsUpdate = true;
-      sMat.opacity = (0.16 + 0.22 * (0.5 + 0.5 * Math.sin(now * 0.0021))) * mobileVis * introGlobe;
+      sMat.opacity = (0.30 + 0.40 * (0.5 + 0.5 * Math.sin(now * 0.0025))) * mobileVis * introGlobe;
 
-      /* Orbit rings: counter-rotate, visible in hero, fade as services enter */
-      ringA.rotation.y += dt * 0.22;
-      ringB.rotation.y -= dt * 0.16;
+      /* Orbit rings: counter-rotate, vibrant highlights, visible in hero */
+      ringA.rotation.y += dt * 0.28;
+      ringB.rotation.y -= dt * 0.20;
       const ringVis = (1 - (isMobile ? heroProg * 1.5 : enter)) * mobileVis * introGlobe;
-      ringMatA.opacity = 0.55 * ringVis;
-      ringMatB.opacity = 0.40 * ringVis;
+      ringMatA.opacity = 0.85 * ringVis;
+      ringMatB.opacity = 0.70 * ringVis;
 
       /* Per-service hue tint: blend material color toward the active stage tint */
       const tA = STAGE_TINTS[Math.min(i0 + 1, 5)] || STAGE_TINTS[0];
