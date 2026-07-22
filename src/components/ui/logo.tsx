@@ -7,7 +7,7 @@ interface LogoProps {
   variant?: "full" | "horizontal";
 }
 
-const LOGO_IMAGE_PATH = "/logo-official.jpg";
+const LOGO_IMAGE_PATH = "/logo-monogram.jpg";
 const LOGO_BANNER_PATH = "/logo-horizontal.jpg";
 
 export default function Logo({ className = "", size = "md", variant = "horizontal" }: LogoProps) {
@@ -39,14 +39,14 @@ export default function Logo({ className = "", size = "md", variant = "horizonta
   return (
     <div className={`flex items-center gap-3 select-none ${className}`}>
       {/* "ab" Gradient Emblem Mark */}
-      <div className="relative overflow-hidden shrink-0 w-9 h-9 md:w-10 md:h-10 rounded-xl flex items-center justify-center bg-black/80 border border-signature/40 shadow-[0_0_20px_rgba(43,160,220,0.3)] group hover:border-signature/70 transition-all duration-300">
+      <div className="relative overflow-hidden shrink-0 w-9 h-9 md:w-10 md:h-10 rounded-xl flex items-center justify-center bg-black border border-signature/40 shadow-[0_0_20px_rgba(43,160,220,0.3)] group hover:border-signature/70 transition-all duration-300">
         <Image
           src={LOGO_IMAGE_PATH}
           alt="AI Buddiess Emblem"
-          width={120}
-          height={120}
+          width={80}
+          height={80}
           priority
-          className="w-full h-full object-cover mix-blend-screen scale-110 group-hover:scale-115 transition-transform duration-300"
+          className="w-full h-full object-cover scale-100 group-hover:scale-105 transition-transform duration-300"
         />
       </div>
 
