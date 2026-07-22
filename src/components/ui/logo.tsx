@@ -46,7 +46,7 @@ export default function Logo({ className = "", size = "md", variant = "horizonta
           width={80}
           height={80}
           priority
-          className="w-full h-full object-cover scale-100 group-hover:scale-105 transition-transform duration-300"
+          className="w-full h-full object-cover scale-120 group-hover:scale-125 transition-transform duration-300"
         />
       </div>
 
