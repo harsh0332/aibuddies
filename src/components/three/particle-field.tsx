@@ -537,8 +537,16 @@ export default function ParticleField({ is3DActive = false }: ParticleFieldProps
       points.position.x += (targetPosX - points.position.x) * 0.08;
 
       const introGlobe = easeOut(clamp((performance.now() - introStart - 420) / 900, 0, 1)); // delay 420ms, duration 900ms
-      const baseScale = isMobile ? 0.60 : lerp(0.9, 1, introGlobe);
-      points.scale.setScalar(baseScale);
+      const baseScale = isMobile ? 0.85 : lerp(0.9, 1, introGlobe);
+      
+      // Aspect ratio correction: ensure 100% perfectly round 3D sphere on mobile portrait screens
+      const aspect = window.innerWidth / window.innerHeight;
+      if (aspect < 1) {
+        points.scale.set(baseScale * aspect, baseScale, baseScale);
+      } else {
+        points.scale.setScalar(baseScale);
+      }
+
       const breathe = 0.92 + 0.06 * Math.sin(now * 0.0012); // subtle living brightness
 
       // On mobile, fade out particle cloud smoothly when scrolling past Hero section into Services
