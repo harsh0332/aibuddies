@@ -49,12 +49,8 @@ export default function Home() {
     if (typeof window === "undefined") return;
 
     const check3DCompatibility = () => {
-      const isLargeScreen = window.innerWidth >= 1024;
-      const isFinePointer = window.matchMedia("(pointer: fine)").matches;
       const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-      
-      const compatible = isLargeScreen && isFinePointer && !prefersReducedMotion;
-      setIs3DActive(compatible);
+      setIs3DActive(!prefersReducedMotion);
     };
 
     check3DCompatibility();
